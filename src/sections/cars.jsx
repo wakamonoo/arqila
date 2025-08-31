@@ -105,9 +105,9 @@ export default function Cars() {
                     </div>
                   </div>
 
-                  <div className="flex w-full justify-center items-center mt-4">
+                  <button onClick={() => router.push(`/carPage/${car.carid}#chat`)} className="flex w-full justify-center items-center mt-4">
                     <MessageOwner />
-                  </div>
+                  </button>
                 </div>
               </div>
             );
