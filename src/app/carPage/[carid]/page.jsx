@@ -1,11 +1,22 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaAddressBook, FaArrowLeft, FaCalendarAlt, FaGasPump, FaUser } from "react-icons/fa";
+import {
+  FaAddressBook,
+  FaArrowLeft,
+  FaCalendarAlt,
+  FaGasPump,
+  FaMapMarkedAlt,
+  FaMapMarkerAlt,
+  FaMarker,
+  FaPhone,
+  FaUser,
+} from "react-icons/fa";
 import { MdAcUnit, MdGarage, MdPriceCheck } from "react-icons/md";
 import Image from "next/image";
 import {
   GiCarSeat,
+  GiGasPump,
   GiGearStick,
   GiGearStickPattern,
   GiPriceTag,
@@ -78,46 +89,87 @@ export default function CarPage() {
             {car.car}
           </h2>
 
-          <div className="bg-second py-4 rounded">
-            <h2 className="ml-8 text-base">Car Specifications</h2>
-            <div className="grid grid-cols-2 gap-1 px-8 relative pt-4 pb-4">
-              <div className="absolute bottom-0 left-8 right-8 border-b border-gray-500" />
-              <div className="flex gap-1 items-center">
+          <div className="flex justify-start w-full px-8 mt-4">
+            <h2 className="text-base">Car Specifications:</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-1 w-full px-8 divide-y divide-gray-500 pt-4 pb-4">
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
                 <FaCalendarAlt className="text-label text-2xl" />
-                <p className="text-base">{car.year}</p>
+                <p className="text-base">Year Model</p>
               </div>
-              <div className="flex gap-1 items-center">
-                <GiPriceTag className="text-label text-2xl" />
-                <p className="text-base uppercase">starts ₱{car.price}</p>
-              </div>
-              <div className="flex gap-1 items-center">
-                <FaGasPump className="text-label text-2xl" />
-                <p className="text-base uppercase">{car.fuel}</p>
-              </div>
-              <div className="flex gap-1 items-center">
-                <GiGearStickPattern className="text-label text-2xl" />
-                <p className="text-base uppercase">{car.transmission}</p>
-              </div>
-              <div className="flex gap-1 items-center">
-                <MdAcUnit className="text-label text-2xl" />
-                <p className="text-base uppercase">{car.aircon}</p>
-              </div>
-              <div className="flex gap-1 items-center">
-                <GiCarSeat className="text-label text-2xl" />
-                <p className="text-base uppercase">{car.seat} seater</p>
-              </div>
+              <p className="text-base font-bold">{car.year}</p>
             </div>
-            <h2 className="ml-8 mt-4 text-base">The Owner</h2>
-            <div className="grid grid-cols-1 gap-1 px-8 relative pt-4 pb-4">
-              <div className="absolute bottom-0 left-8 right-8 border-b border-gray-500" />
-              <div className="flex gap-1 items-center">
+
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
+                <GiPriceTag className="text-label text-2xl" />
+                <p className="text-base">Starting at</p>
+              </div>
+              <p className="text-base font-bold">₱{car.price}</p>
+            </div>
+
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
+                <FaGasPump className="text-label text-2xl" />
+                <p className="text-base">Fuel Type</p>
+              </div>
+              <p className="text-base font-bold capitalize">{car.fuel}</p>
+            </div>
+
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
+                <GiGearStick className="text-label text-2xl" />
+                <p className="text-base">Transmission</p>
+              </div>
+              <p className="text-base font-bold capitalize">
+                {car.transmission}
+              </p>
+            </div>
+
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
+                <MdAcUnit className="text-label text-2xl" />
+                <p className="text-base">Airconditioning</p>
+              </div>
+              <p className="text-base font-bold capitalize">{car.aircon}</p>
+            </div>
+
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
+                <GiCarSeat className="text-label text-2xl" />
+                <p className="text-base">Seat Capacity</p>
+              </div>
+              <p className="text-base font-bold capitalize">{car.seat}</p>
+            </div>
+          </div>
+
+          <div className="flex justify-start w-full px-8 mt-4">
+            <h2 className="text-base">The Owner</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-1 w-full px-8 divide-y divide-gray-500 pt-4 pb-4">
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
                 <FaUser className="text-label text-2xl" />
-                <p className="text-base">{user?.name}</p>
+                <p className="text-base">Name</p>
               </div>
-              <div className="flex gap-1 items-center">
-                <FaAddressBook className="text-label text-2xl" />
-                <p className="text-base">{user?.address}</p>
+              <p className="text-base font-bold capitalize">{user?.name}</p>
+            </div>
+
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
+                <FaMapMarkerAlt className="text-label text-2xl" />
+                <p className="text-base">Address</p>
               </div>
+              <p className="text-base font-bold capitalize">{user?.address}</p>
+            </div>
+
+            <div className="flex justify-between py-2 items-center">
+              <div className="flex items-center justify-center gap-1">
+                <FaPhone className="text-label text-2xl" />
+                <p className="text-base">Contact</p>
+              </div>
+              <p className="text-base font-bold capitalize">{user?.contact}</p>
             </div>
           </div>
         </div>
