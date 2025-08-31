@@ -1,10 +1,15 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaArrowLeft, FaCalendarAlt, FaGasPump } from "react-icons/fa";
+import { FaAddressBook, FaArrowLeft, FaCalendarAlt, FaGasPump, FaUser } from "react-icons/fa";
 import { MdAcUnit, MdGarage, MdPriceCheck } from "react-icons/md";
 import Image from "next/image";
-import { GiCarSeat, GiGearStick, GiGearStickPattern, GiPriceTag } from "react-icons/gi";
+import {
+  GiCarSeat,
+  GiGearStick,
+  GiGearStickPattern,
+  GiPriceTag,
+} from "react-icons/gi";
 
 const BASE_URL =
   process.env.NODE_ENV === "production"
@@ -14,7 +19,7 @@ const BASE_URL =
 export default function CarPage() {
   const { carid } = useParams();
   const [car, setCar] = useState(null);
-
+  const [user, setUser] = useState(null);
   useEffect(() => {
     const carFetch = async () => {
       try {
@@ -27,6 +32,20 @@ export default function CarPage() {
     };
     carFetch();
   }, [carid]);
+
+  useEffect(() => {
+    const userFetch = async () => {
+      try {
+        if (!car || !car.uid) return;
+        const res = await fetch(`${BASE_URL}/api/users/users/${car.uid}`);
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    userFetch();
+  }, [car]);
 
   if (!car) {
     return (
@@ -59,33 +78,48 @@ export default function CarPage() {
             {car.car}
           </h2>
 
-          <div className="grid grid-cols-1 gap-x-2 self-start px-8">
-            <div className="flex gap-1 items-center">
-            <FaCalendarAlt className="text-label text-2xl" />
-            <p className="text-base">Year Model: {car.year}</p>
+          <div className="bg-second py-4 rounded">
+            <h2 className="ml-8 text-base">Car Specifications</h2>
+            <div className="grid grid-cols-2 gap-1 px-8 relative pt-4 pb-4">
+              <div className="absolute bottom-0 left-8 right-8 border-b border-gray-500" />
+              <div className="flex gap-1 items-center">
+                <FaCalendarAlt className="text-label text-2xl" />
+                <p className="text-base">{car.year}</p>
+              </div>
+              <div className="flex gap-1 items-center">
+                <GiPriceTag className="text-label text-2xl" />
+                <p className="text-base uppercase">starts ₱{car.price}</p>
+              </div>
+              <div className="flex gap-1 items-center">
+                <FaGasPump className="text-label text-2xl" />
+                <p className="text-base uppercase">{car.fuel}</p>
+              </div>
+              <div className="flex gap-1 items-center">
+                <GiGearStickPattern className="text-label text-2xl" />
+                <p className="text-base uppercase">{car.transmission}</p>
+              </div>
+              <div className="flex gap-1 items-center">
+                <MdAcUnit className="text-label text-2xl" />
+                <p className="text-base uppercase">{car.aircon}</p>
+              </div>
+              <div className="flex gap-1 items-center">
+                <GiCarSeat className="text-label text-2xl" />
+                <p className="text-base uppercase">{car.seat} seater</p>
+              </div>
+            </div>
+            <h2 className="ml-8 mt-4 text-base">The Owner</h2>
+            <div className="grid grid-cols-1 gap-1 px-8 relative pt-4 pb-4">
+              <div className="absolute bottom-0 left-8 right-8 border-b border-gray-500" />
+              <div className="flex gap-1 items-center">
+                <FaUser className="text-label text-2xl" />
+                <p className="text-base">{user?.name}</p>
+              </div>
+              <div className="flex gap-1 items-center">
+                <FaAddressBook className="text-label text-2xl" />
+                <p className="text-base">{user?.address}</p>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-1 items-center">
-            <GiPriceTag className="text-label text-2xl" />
-            <p className="text-base">Starts At: ₱{car.price}</p>
-          </div>
-          <div className="flex gap-1 items-center">
-            <FaGasPump className="text-label text-2xl" />
-            <p className="text-base">Fuel: <span className="uppercase">{car.fuel}</span></p>
-          </div>
-          <div className="flex gap-1 items-center">
-            <GiGearStickPattern className="text-label text-2xl" />
-            <p className="text-base">Gearbox: <span className="uppercase">{car.transmission}</span></p>
-          </div>
-          <div className="flex gap-1 items-center">
-            <MdAcUnit className="text-label text-2xl" />
-            <p className="text-base">AirConditioning: <span className="uppercase">{car.aircon}</span></p>
-          </div>
-          <div className="flex gap-1 items-center">
-            <GiCarSeat className="text-label text-2xl" />
-            <p className="text-base">Seat Cap: <span className="uppercase">{car.seat}</span></p>
-          </div>
-          </div>
-
         </div>
       </div>
     </div>
