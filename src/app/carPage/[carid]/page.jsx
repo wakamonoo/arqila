@@ -12,7 +12,7 @@ import {
   FaPhone,
   FaUser,
 } from "react-icons/fa";
-import { MdAcUnit, MdGarage, MdPriceCheck } from "react-icons/md";
+import { MdAcUnit, MdGarage, MdPriceCheck, MdSend } from "react-icons/md";
 import Image from "next/image";
 import {
   GiCarSeat,
@@ -172,6 +172,16 @@ export default function CarPage() {
               <p className="text-base font-bold capitalize">{user?.contact}</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col relative bg-second w-full h-screen flex-1">
+        <div className="flex justify-center bg-panel p-4"> 
+          <h1 className="text-base">Get in touch with <span className="font-bold">{user.name}</span></h1>
+        </div>
+        <div className="bg-panel absolute bottom-0 w-full flex items-center justify-between gap-2 p-4">
+          <input type="text" placeholder="enter your message" className="bg-second w-full p-2 rounded" />
+          <MdSend className="text-2xl" />
         </div>
       </div>
     </div>
