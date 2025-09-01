@@ -9,18 +9,11 @@ import {
   FaPhone,
   FaUser,
 } from "react-icons/fa";
-import {
-  MdAcUnit,
-  MdGarage,
-  MdMessage,
-} from "react-icons/md";
+import { MdAcUnit, MdGarage, MdMessage } from "react-icons/md";
 import Image from "next/image";
-import {
-  GiCarSeat,
-  GiGearStick,
-  GiPriceTag,
-} from "react-icons/gi";
-import Chat from "@/components/chat.jsx"
+import { GiCarSeat, GiGearStick, GiPriceTag } from "react-icons/gi";
+import Chat from "@/components/chat.jsx";
+import Loader from "@/components/loader";
 
 const BASE_URL =
   process.env.NODE_ENV === "production"
@@ -32,16 +25,20 @@ export default function CarPage() {
   const [car, setCar] = useState(null);
   const [user, setUser] = useState(null);
   const [showChat, setShowChat] = useState(false);
+  const [loader, setLoader] = useState(false);
   const chatRef = useRef();
 
   useEffect(() => {
     const carFetch = async () => {
+      setLoader(true);
       try {
         const res = await fetch(`${BASE_URL}/api/cars/carsDisplay/${carid}`);
         const data = await res.json();
         setCar(data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoader(false);
       }
     };
     carFetch();
@@ -74,6 +71,14 @@ export default function CarPage() {
     };
   }, []);
 
+  if (loader) {
+    return (
+      <div className="flex justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full p-24 sm:px-32 md:px-48 lg:px-64 xl:px-82">
+        <Loader />
+      </div>
+    );
+  }
+  
   if (!car) {
     return (
       <div className="flex flex-col left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -241,7 +246,7 @@ export default function CarPage() {
         </div>
 
         {showChat && (
-          <Chat chatRef={chatRef} user={user} setShowChat={setShowChat}/>
+          <Chat chatRef={chatRef} user={user} setShowChat={setShowChat} />
         )}
       </div>
     </div>
