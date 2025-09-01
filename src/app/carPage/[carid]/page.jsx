@@ -27,6 +27,7 @@ export default function CarPage() {
   const [showChat, setShowChat] = useState(false);
   const [loader, setLoader] = useState(false);
   const chatRef = useRef();
+  const botRef = useRef();
 
   useEffect(() => {
     const carFetch = async () => {
@@ -60,14 +61,19 @@ export default function CarPage() {
 
   useEffect(() => {
     const handleOutClick = (e) => {
-      if (chatRef.current && !chatRef.current.contains(e.target)) {
+      if (
+        chatRef.current &&
+        !chatRef.current.contains(e.target) &&
+        botRef.current &&
+        !botRef.current.contains(e.target)
+      ) {
         setShowChat(false);
       }
     };
 
-    document.addEventListener("mousedown", handleOutClick);
+    document.addEventListener("pointerdown", handleOutClick);
     return () => {
-      document.removeEventListener("mousedown", handleOutClick);
+      document.removeEventListener("pointerdown", handleOutClick);
     };
   }, []);
 
@@ -78,7 +84,7 @@ export default function CarPage() {
       </div>
     );
   }
-  
+
   if (!car) {
     return (
       <div className="flex flex-col left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -238,7 +244,8 @@ export default function CarPage() {
 
         <div className="fixed bottom-4 right-4 group">
           <button
-            onClick={() => setShowChat(true)}
+            ref={botRef}
+            onClick={() => setShowChat((prev) => !prev)}
             className=" p-4 bg-panel rounded-full cursor-pointer group-hover:bg-[var(--color-highlight)]"
           >
             <MdMessage className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-highlight group-hover:text-[var(--color-panel)]" />
