@@ -1,6 +1,6 @@
 import { MdClose, MdSend } from "react-icons/md";
 
-export default function Chat({ chatRef, user }) {
+export default function Chat({ chatRef, user, setShowChat}) {
   return (
     <div
       ref={chatRef}

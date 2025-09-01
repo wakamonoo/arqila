@@ -241,7 +241,7 @@ export default function CarPage() {
         </div>
 
         {showChat && (
-          <Chat chatRef={chatRef} user={user}/>
+          <Chat chatRef={chatRef} user={user} setShowChat={setShowChat}/>
         )}
       </div>
     </div>
