@@ -29,7 +29,7 @@ router.post("/signup", async (req, res) => {
 });
 
 router.put("/updateUser", async (req, res) => {
-  const { uid, name, contact, address } = req.body;
+  const { uid, name, contact, address, info } = req.body;
   try {
     const client = await clientPromise;
     const db = client.db("arqila");
@@ -38,7 +38,7 @@ router.put("/updateUser", async (req, res) => {
       .collection("users")
       .updateOne(
         { uid },
-        { $set: { name, contact, address } },
+        { $set: { name, contact, address, info } },
         { upsert: true }
       );
 

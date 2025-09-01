@@ -28,7 +28,12 @@ export default function Profile() {
   const [edit, setEdit] = useState(false);
   const divRef = useRef();
   const ListRef = useRef();
-  const [form, setForm] = useState({ name: "", contact: "", address: "" });
+  const [form, setForm] = useState({
+    name: "",
+    contact: "",
+    address: "",
+    info: "",
+  });
   const [carForm, setCarForm] = useState({
     car: "",
     year: "",
@@ -67,6 +72,7 @@ export default function Profile() {
             name: dbUser.name || "",
             contact: dbUser.contact || "",
             address: dbUser.address || "",
+            info: dbUser.info || "",
           });
 
           if (dbUser && dbUser.role === "driver") {
@@ -421,7 +427,7 @@ export default function Profile() {
           </div>
 
           {showInfo && (
-            <div className="flex justify-left items-center flex-col gap-2 p-4 mt-2">
+            <div className="flex justify-start items-center flex-col gap-2 p-4 mt-2">
               <div className="flex flex-col gap-2 sm:gap-4 md:gap-6">
                 <p className="text-header font-heading text-base sm:text-xl md:text-2xl leading-6 sm:leading-8 md:leading-10">
                   Full Name:
@@ -452,11 +458,22 @@ export default function Profile() {
                   Address:
                   <br />
                   <span
-                    className={`font-normal border-l-2 px-2 border-[var(--color-highlight)] text-base sm:text-xl md:text-2xl ${
+                    className={`block text-justify font-normal border-l-2 px-2 border-[var(--color-highlight)] text-base sm:text-xl md:text-2xl  ${
                       !user.address ? "italic text-gray-500" : "text-normal"
                     }`}
                   >
                     {user.address || "contact not yet added"}
+                  </span>
+                </p>
+                <p className="text-header font-heading text-base sm:text-xl md:text-2xl leading-6 sm:leading-8 md:leading-10">
+                  Why you?
+                  <br />
+                  <span
+                    className={`font-normal border-l-2 px-2 border-[var(--color-highlight)] text-base sm:text-xl md:text-2xl ${
+                      !user.info ? "italic text-gray-500" : "text-normal"
+                    }`}
+                  >
+                    {user.info || "why should rentors choose you?"}
                   </span>
                 </p>
                 <button
@@ -556,6 +573,14 @@ export default function Profile() {
                 value={form.address}
                 onChange={handleInputChange}
                 className="rounded  bg-second font-normal text-base sm:text-xl md:text-2xl w-ful p-3"
+              />
+              <textarea
+                type="text"
+                placeholder="Why should rentors should choose you?"
+                name="info"
+                value={form.info}
+                onChange={handleInputChange}
+                className="rounded  bg-second font-normal text-base sm:text-xl md:text-2xl w-ful min-h-[20vh] p-3"
               />
               <button
                 onClick={handleSubmit}

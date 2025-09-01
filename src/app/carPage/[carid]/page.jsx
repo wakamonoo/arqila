@@ -71,25 +71,26 @@ export default function CarPage() {
 
   return (
     <div>
-      <div className="lg:pl-48 xl:pl-64 lg:pr-0 xl:pr-0 ">
+      <div className="pt-12 sm:px-24 md:px-32  lg:px-48 xl:px-64">
         <a href="/">
-          <FaArrowLeft className="absolute cursor-pointer left-[6vw] text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110 mt-12" />
+          <FaArrowLeft className="absolute cursor-pointer left-[6vw] text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
         </a>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[55%_43%] xl:lg:grid-cols-[55%_41%] gap-[2%] xl:gap-[4%] 2xl:lg:grid-cols-[60%_35%] 2xl:gap-[5%] w-full">
-          <div className="flex flex-col justify-center items-center pt-12 sm:px-24 md:px-32 lg:px-0 ">
-            <Image
-              src={car.image}
-              alt="car"
-              width={0}
-              height={0}
-              sizes="100vw"
-              className="w-46 sm:w-56 h-32 sm:h-42 object-cover"
-            />
-            <h2 className="text-normal text-center font-heading text-xl sm:text-2xl md:text-3xl font-semibold uppercase">
-              {car.car}
-            </h2>
-
+        <div className="flex flex-col items-center justify-center mb-2 sm:mb-4 md:mb-8">
+          <Image
+            src={car.image}
+            alt="car"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="w-40 sm:w-56 md:w-64 lg:w-72 xl:w-80 h-28 sm:h-36 md:h-44 lg:h-52 xl:h-60 object-cover rounded"
+          />
+          <h2 className="text-normal text-center font-heading text-xl sm:text-2xl md:text-3xl font-semibold uppercase">
+            {car.car}
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 w-full">
+          <div className="flex flex-col items-center">
             <div className="flex justify-start w-full px-8 mt-4">
               <h2 className="text-base sm:text-xl md:text-2xl font-heading">
                 Car Specifications:
@@ -164,7 +165,9 @@ export default function CarPage() {
                 </p>
               </div>
             </div>
+          </div>
 
+          <div>
             <div className="flex justify-start w-full px-8 mt-4">
               <h2 className="text-base sm:text-xl md:text-2xl">The Owner</h2>
             </div>
@@ -199,24 +202,22 @@ export default function CarPage() {
                 </p>
               </div>
             </div>
-          </div>
-          <div
-            id="chat"
-            className="flex flex-col relative bg-second w-full h-screen flex-1"
-          >
-            <div className="flex justify-center bg-panel p-4">
-              <h1 className="text-base sm:text-xl md:text-2xl">
-                Get in touch with{" "}
-                <span className="font-bold">{user?.name}</span>
-              </h1>
-            </div>
-            <div className="bg-panel absolute bottom-0 w-full flex items-center justify-between gap-2 p-4">
-              <input
-                type="text"
-                placeholder="enter your message"
-                className="bg-second w-full p-2 rounded text-base sm:text-xl md:text-2xl"
-              />
-              <MdSend className="text-2xl sm:text-3xl md:text-4xl" />
+            <div className="flex flex-col gap-4 justify-start w-full px-8 mt-4">
+              <h2 className="text-base sm:text-xl md:text-2xl">
+                Why choose me?
+              </h2>
+              <p className="text-base sm:text-xl md:text-2xl">
+                "Hi, I’m [Owner’s Name], the proud owner and driver of this car
+                rental service. I’m committed to providing you with a safe,
+                comfortable, and hassle-free travel experience. With years of
+                driving experience and deep knowledge of the local routes, I
+                ensure that every trip is smooth, enjoyable, and on time.
+                Whether you need a ride for business, leisure, or special
+                occasions, I go the extra mile to make sure you feel at ease
+                throughout your journey. Your comfort and satisfaction are my
+                top priorities — sit back, relax, and let me take care of the
+                driving while you enjoy the ride."
+              </p>
             </div>
           </div>
         </div>
