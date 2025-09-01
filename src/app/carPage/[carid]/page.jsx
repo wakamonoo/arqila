@@ -1,14 +1,11 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  FaAddressBook,
   FaArrowLeft,
   FaCalendarAlt,
   FaGasPump,
-  FaMapMarkedAlt,
   FaMapMarkerAlt,
-  FaMarker,
   FaPhone,
   FaUser,
 } from "react-icons/fa";
@@ -16,17 +13,14 @@ import {
   MdAcUnit,
   MdGarage,
   MdMessage,
-  MdPriceCheck,
-  MdSend,
 } from "react-icons/md";
 import Image from "next/image";
 import {
   GiCarSeat,
-  GiGasPump,
   GiGearStick,
-  GiGearStickPattern,
   GiPriceTag,
 } from "react-icons/gi";
+import Chat from "@/components/chat.jsx"
 
 const BASE_URL =
   process.env.NODE_ENV === "production"
@@ -38,6 +32,8 @@ export default function CarPage() {
   const [car, setCar] = useState(null);
   const [user, setUser] = useState(null);
   const [showChat, setShowChat] = useState(false);
+  const chatRef = useRef();
+
   useEffect(() => {
     const carFetch = async () => {
       try {
@@ -64,6 +60,19 @@ export default function CarPage() {
     };
     userFetch();
   }, [car]);
+
+  useEffect(() => {
+    const handleOutClick = (e) => {
+      if (chatRef.current && !chatRef.current.contains(e.target)) {
+        setShowChat(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutClick);
+    };
+  }, []);
 
   if (!car) {
     return (
@@ -223,15 +232,16 @@ export default function CarPage() {
         </div>
 
         <div className="fixed bottom-4 right-4 group">
-          <button onClick={() => setShowChat(true)} className=" p-4 bg-panel rounded-full cursor-pointer group-hover:bg-[var(--color-highlight)]">
+          <button
+            onClick={() => setShowChat(true)}
+            className=" p-4 bg-panel rounded-full cursor-pointer group-hover:bg-[var(--color-highlight)]"
+          >
             <MdMessage className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-highlight group-hover:text-[var(--color-panel)]" />
           </button>
         </div>
 
         {showChat && (
-          <div>
-            fjsdhjf
-          </div>
+          <Chat chatRef={chatRef} user={user}/>
         )}
       </div>
     </div>
