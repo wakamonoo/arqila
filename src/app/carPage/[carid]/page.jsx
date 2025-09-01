@@ -12,7 +12,13 @@ import {
   FaPhone,
   FaUser,
 } from "react-icons/fa";
-import { MdAcUnit, MdGarage, MdPriceCheck, MdSend } from "react-icons/md";
+import {
+  MdAcUnit,
+  MdGarage,
+  MdMessage,
+  MdPriceCheck,
+  MdSend,
+} from "react-icons/md";
 import Image from "next/image";
 import {
   GiCarSeat,
@@ -31,6 +37,7 @@ export default function CarPage() {
   const { carid } = useParams();
   const [car, setCar] = useState(null);
   const [user, setUser] = useState(null);
+  const [showChat, setShowChat] = useState(false);
   useEffect(() => {
     const carFetch = async () => {
       try {
@@ -85,14 +92,14 @@ export default function CarPage() {
             sizes="100vw"
             className="w-40 sm:w-56 md:w-64 lg:w-72 xl:w-80 h-28 sm:h-36 md:h-44 lg:h-52 xl:h-60 object-cover rounded"
           />
-          <h2 className="text-normal text-center font-heading text-xl sm:text-2xl md:text-3xl font-semibold uppercase">
+          <h2 className="text-normal text-center font-heading text-xl sm:text-2xl md:text-3xl font-semibold uppercase border-b-4 border-[var(--color-highlight)]">
             {car.car}
           </h2>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 w-full">
           <div className="flex flex-col items-center">
             <div className="flex justify-start w-full px-8 mt-4">
-              <h2 className="text-base sm:text-xl md:text-2xl font-heading">
+              <h2 className="text-base sm:text-xl md:text-2xl font-heading border-b-4 border-[var(--color-highlight)]">
                 Car Specifications:
               </h2>
             </div>
@@ -169,7 +176,9 @@ export default function CarPage() {
 
           <div>
             <div className="flex justify-start w-full px-8 mt-4">
-              <h2 className="text-base sm:text-xl md:text-2xl">The Owner</h2>
+              <h2 className="text-base sm:text-xl md:text-2xl border-b-4 border-[var(--color-highlight)]">
+                The Owner
+              </h2>
             </div>
             <div className="grid grid-cols-1 gap-1 w-full px-8 divide-y divide-gray-500 pt-4 pb-4">
               <div className="flex justify-between py-2 items-center">
@@ -203,24 +212,27 @@ export default function CarPage() {
               </div>
             </div>
             <div className="flex flex-col gap-4 justify-start w-full px-8 mt-4">
-              <h2 className="text-base sm:text-xl md:text-2xl">
+              <h2 className="text-base sm:text-xl md:text-2xl capitalize border-b-4 border-[var(--color-highlight)] w-fit">
                 Why choose me?
               </h2>
-              <p className="text-base sm:text-xl md:text-2xl">
-                "Hi, I’m [Owner’s Name], the proud owner and driver of this car
-                rental service. I’m committed to providing you with a safe,
-                comfortable, and hassle-free travel experience. With years of
-                driving experience and deep knowledge of the local routes, I
-                ensure that every trip is smooth, enjoyable, and on time.
-                Whether you need a ride for business, leisure, or special
-                occasions, I go the extra mile to make sure you feel at ease
-                throughout your journey. Your comfort and satisfaction are my
-                top priorities — sit back, relax, and let me take care of the
-                driving while you enjoy the ride."
+              <p className="text-base text-justify sm:text-xl md:text-2xl">
+                {user?.info}
               </p>
             </div>
           </div>
         </div>
+
+        <div className="fixed bottom-4 right-4 group">
+          <button onClick={() => setShowChat(true)} className=" p-4 bg-panel rounded-full cursor-pointer group-hover:bg-[var(--color-highlight)]">
+            <MdMessage className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-highlight group-hover:text-[var(--color-panel)]" />
+          </button>
+        </div>
+
+        {showChat && (
+          <div>
+            fjsdhjf
+          </div>
+        )}
       </div>
     </div>
   );

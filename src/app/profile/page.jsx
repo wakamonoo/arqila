@@ -427,8 +427,8 @@ export default function Profile() {
           </div>
 
           {showInfo && (
-            <div className="flex justify-start items-center flex-col gap-2 p-4 mt-2">
-              <div className="flex flex-col gap-2 sm:gap-4 md:gap-6">
+            <div className="flex justify-center items-center flex-col gap-2 p-4 mt-2">
+              <div className="grid grid-cols-1 lg:grid-cols-2  gap-2 sm:gap-4 md:gap-6 max-w-4xl">
                 <p className="text-header font-heading text-base sm:text-xl md:text-2xl leading-6 sm:leading-8 md:leading-10">
                   Full Name:
                   <br />
@@ -465,7 +465,7 @@ export default function Profile() {
                     {user.address || "contact not yet added"}
                   </span>
                 </p>
-                <p className="text-header font-heading text-base sm:text-xl md:text-2xl leading-6 sm:leading-8 md:leading-10">
+                <p className="text-header font-heading text-base sm:text-xl md:text-2xl leading-6 sm:leading-8 md:leading-10 text-justify col-span-2">
                   Why you?
                   <br />
                   <span
@@ -476,15 +476,15 @@ export default function Profile() {
                     {user.info || "why should rentors choose you?"}
                   </span>
                 </p>
-                <button
-                  onClick={() => setEdit(true)}
-                  className="mt-4 bg-highlight group duration-200 cursor-pointer hover:bg-[var(--color-secondary)] p-4 w-fit rounded-full"
-                >
-                  <p className="text-second duration-200 group-hover:text-[var(--color-highlight)] ttext-base sm:text-xl md:text-2xl uppercase font-bold">
-                    edit information
-                  </p>
-                </button>
               </div>
+              <button
+                onClick={() => setEdit(true)}
+                className="mt-4 bg-highlight group duration-200 cursor-pointer hover:bg-[var(--color-secondary)] p-4 w-fit rounded-full"
+              >
+                <p className="text-second duration-200 group-hover:text-[var(--color-highlight)] ttext-base sm:text-xl md:text-2xl uppercase font-bold">
+                  edit information
+                </p>
+              </button>
             </div>
           )}
           {showDriver ? (
