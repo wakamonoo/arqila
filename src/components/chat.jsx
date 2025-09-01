@@ -22,7 +22,7 @@ export default function Chat({ chatRef, user, setShowChat}) {
           className="w-[85%] h-[6vh] text-normal placeholder-[var(--color-label)] text-base sm:text-xl md:text-2xl bg-second p-2 rounded-md"
           placeholder="kindly type your message!"
         />
-        <MdSend className="text-5xl text-normal bg-second p-2 w-[15%] h-[6vh] rounded-md transition duration-100 hover:scale-110 active:scale-110" />
+        <MdSend className="cursor-pointer text-5xl text-normal bg-second p-2 w-[15%] h-[6vh] rounded-md transition duration-100 hover:scale-110 active:scale-110" />
       </div>
     </div>
   );
