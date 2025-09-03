@@ -1,121 +1,89 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { io } from "socket.io-client";
 import { MdClose, MdSend } from "react-icons/md";
-import io from "socket.io-client";
-import { auth } from "@/firebase/firebaseConfig";
 
 const BASE_URL =
   process.env.NODE_ENV === "production"
     ? "https://arqila.onrender.com"
     : "http://localhost:4000";
+const socket = io.connect(`${BASE_URL}`);
 
-let socket;
-
-export default function Chat({ chatRef, user, carId, driverUid, setShowChat }) {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const listRef = useRef(null);
+export default function Chat({ chatRef, user, car, driver, setShowChat }) {
+  const [message, setMessage] = useState("");
+  const [messageSent, setMessageSent] = useState([]);
 
   useEffect(() => {
-    const init = async () => {
-      const res = await fetch(`${BASE_URL}/api/chat/${carId}`);
-      const data = await res.json();
-      setMessages(data || []);
+    socket.emit("join_room", {
+      carId: car,
+      driverId: driver,
+      userId: user.uid,
+    });
 
-      if (!socket) {
-        socket = io(BASE_URL, { withCredentials: true });
-      }
-      socket.emit("chat:join", { carId });
-
-      socket.on("chat:message", (msg) => {
-        if (msg && msg.carId === carId) {
-          setMessages((prev) => [...prev, msg]);
-        }
-      });
+    const handleMessages = (data) => {
+      setMessageSent((prev) => [...prev, data]);
     };
-    init();
+
+    socket.on("message_display", handleMessages);
 
     return () => {
-      if (socket) {
-        socket.off("chat:message");
-      }
+      socket.off("message_display", handleMessages);
     };
-  }, [carId]);
+  }, [user.uid, car, driver]);
 
-  useEffect(() => {
-    listRef.current?.scrollTo(0, listRef.current.scrollHeight);
-  }, [messages]);
+  const sendMessage = () => {
+    if(!message.trim()) return;
 
-  const send = () => {
-    const senderUid = auth.currentUser?.uid;
-    if (!senderUid || !input.trim()) return;
-
-    const payload = {
-      carId,
-      senderUid,
-      receiverUid: driverUid,
-      text: input.trim(),
+    const msgData = {
+      carId: car,
+      driverId: driver,
+      userId: user.uid,
+      message,
+      sender: user.name,
+      time: new Date(),
     };
-    socket.emit("chat:message", payload, () => {});
-    setInput("");
+
+    socket.emit("send_message", msgData );
+    setMessage("");
   };
-
-  const isMine = (m) => m.senderUid === auth.currentUser?.uid;
 
   return (
     <div
       ref={chatRef}
-      className="fixed flex flex-col bottom-22 lg:bottom-25 right-8 w-[92vw] sm:w-[60vw] md:w-[45vw] lg:w-[36vw] xl:w-[30vw] 2xl:w-[28vw] h-[70vh] rounded-2xl overflow-hidden shadow-2xl"
+      className="fixed flex flex-col bottom-22 lg:bottom-25 right-4 z-100 bg-second shadow-2xl w-[90vw] sm:w-[80vw] md:w-[65vw] lg:w-[50vw] xl:w-[40vw] 2xl:w-[30vw] h-[70vh] rounded-2xl overflow-hidden"
     >
       <div className="flex justify-between bg-panel p-4">
         <div>
           <h1 className="text-base sm:text-xl md:text-2xl font-bold">
-            {user?.name || "Chat"}
+            {user?.name}
           </h1>
-          <p className="text-xs opacity-70">Car Room: {carId}</p>
         </div>
-        <button onClick={() => setShowChat(false)} aria-label="Close chat">
+        <button onClick={() => setShowChat(false)}>
           <MdClose className="cursor-pointer text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
         </button>
       </div>
-
-      <div
-        ref={listRef}
-        className="flex-1 bg-second p-3 overflow-y-auto space-y-2"
-      >
-        {messages.map((m, idx) => (
-          <div
-            key={idx}
-            className={`max-w-[80%] px-3 py-2 rounded-xl ${
-              isMine(m)
-                ? "ml-auto bg-[var(--color-highlight)] text-[var(--color-panel)]"
-                : "bg-panel text-normal"
-            }`}
-          >
-            <div className="text-xs opacity-60 mb-0.5">
-              {isMine(m) ? "You" : user?.name || "Driver"}
-            </div>
-            <div className="whitespace-pre-wrap break-words">{m.text}</div>
-          </div>
-        ))}
+      <div className="flex-1">
+        {messageSent.map((msg, index) => {
+          return <p key={index}> {msg.message}</p>;
+        })}
       </div>
-
       <div className="flex bg-panel justify-between gap-2 items-center p-3">
         <textarea
           className="w-[85%] h-[6vh] text-normal placeholder-[var(--color-label)] text-base sm:text-xl md:text-2xl bg-second p-2 rounded-md"
-          placeholder="Type your message…"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          placeholder="kindly type your message!"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
+            if(e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              send();
+              sendMessage();
             }
           }}
         />
-        <button onClick={send} aria-label="Send message">
-          <MdSend className="cursor-pointer text-5xl text-normal bg-second p-2 rounded-md transition duration-100 hover:scale-110 active:scale-110" />
-        </button>
+        <MdSend
+          onClick={sendMessage}
+          className="cursor-pointer text-5xl text-normal bg-second p-2 w-[15%] h-[6vh] rounded-md transition duration-100 hover:scale-110 active:scale-110"
+        />
       </div>
     </div>
   );
