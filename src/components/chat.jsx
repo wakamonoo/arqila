@@ -9,11 +9,13 @@ const BASE_URL =
     : "http://localhost:4000";
 const socket = io.connect(`${BASE_URL}`);
 
-export default function Chat({ chatRef, user, car, driver, setShowChat }) {
+export default function Chat({ chatRef, user, owner, car, driver, setShowChat }) {
   const [message, setMessage] = useState("");
   const [messageSent, setMessageSent] = useState([]);
 
   useEffect(() => {
+    if(!user || !user.uid) return;
+    
     socket.emit("join_room", {
       carId: car,
       driverId: driver,
@@ -32,8 +34,15 @@ export default function Chat({ chatRef, user, car, driver, setShowChat }) {
   }, [user.uid, car, driver]);
 
   const sendMessage = () => {
+    if(!user || !user.uid) {
+      alert("kindly login first");
+    }
     if(!message.trim()) return;
 
+    if(driver === user.uid) {
+      alert("you cant fucking chat with your own dumbass");
+      return;
+    }
     const msgData = {
       carId: car,
       driverId: driver,
@@ -55,7 +64,7 @@ export default function Chat({ chatRef, user, car, driver, setShowChat }) {
       <div className="flex justify-between bg-panel p-4">
         <div>
           <h1 className="text-base sm:text-xl md:text-2xl font-bold">
-            {user?.name}
+            {owner?.name}
           </h1>
         </div>
         <button onClick={() => setShowChat(false)}>

@@ -14,6 +14,7 @@ import Image from "next/image";
 import { GiCarSeat, GiGearStick, GiPriceTag } from "react-icons/gi";
 import Chat from "@/components/chat.jsx";
 import Loader from "@/components/loader";
+import { auth } from "@/firebase/firebaseConfig";
 
 const BASE_URL =
   process.env.NODE_ENV === "production"
@@ -28,6 +29,25 @@ export default function CarPage() {
   const [loader, setLoader] = useState(false);
   const chatRef = useRef();
   const botRef = useRef();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((loggedIn) => {
+      if(loggedIn) {
+        setCurrentUser({
+          uid: loggedIn.uid,
+          name: loggedIn.name,
+          email: loggedIn.email,
+          photo: loggedIn.photoURL,
+        });
+      } else {
+        setCurrentUser(null);
+      }
+    });
+    return() => {
+      unsubscribe();
+    }
+  }, [])
 
   useEffect(() => {
     const carFetch = async () => {
@@ -253,7 +273,7 @@ export default function CarPage() {
         </div>
 
         {showChat && (
-          <Chat chatRef={chatRef} user={user} car={carid} driver={car?.uid} setShowChat={setShowChat} />
+          <Chat chatRef={chatRef} user={currentUser} owner={user} car={carid} driver={car?.uid} setShowChat={setShowChat} />
         )}
       </div>
     </div>
