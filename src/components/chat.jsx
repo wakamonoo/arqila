@@ -1,58 +1,76 @@
+// src/components/chat.jsx
+// CHANGED/ADDED: uses conversation join, conversation_history, new_message, send_message
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { io } from "socket.io-client";
 import { MdClose, MdSend } from "react-icons/md";
-
+import { io } from "socket.io-client";
 const BASE_URL =
   process.env.NODE_ENV === "production"
     ? "https://arqila.onrender.com"
     : "http://localhost:4000";
 const socket = io.connect(`${BASE_URL}`);
 
-export default function Chat({ chatRef, user, owner, car, driver, setShowChat }) {
+export default function CarPageChat({ chatRef, user, car, driver, setShowChat, owner }) {
   const [message, setMessage] = useState("");
-  const [messageSent, setMessageSent] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const listRef = useRef(null);
 
   useEffect(() => {
-    if(!user || !user.uid) return;
-    
-    socket.emit("join_room", {
-      carId: car,
-      driverId: driver,
-      userId: user.uid,
-    });
+    // auto-scroll when messages update
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [messages]);
 
-    const handleMessages = (data) => {
-      setMessageSent((prev) => [...prev, data]);
+  useEffect(() => {
+    if (!user || !user.uid) return;
+    if (!car || !driver) return;
+
+    const payload = { carId: car, driverId: driver, userId: user.uid };
+
+    socket.emit("join_conversation", payload);
+    socket.emit("join_user", { userId: user.uid }); // personal room
+
+    const handleHistory = (history) => {
+      setMessages(history || []);
+    };
+    const handleNew = (msg) => {
+      // only accept messages for this convo
+      if (msg.carId === car && msg.driverId === driver && msg.userId === user.uid) {
+        setMessages((prev) => [...prev, msg]);
+      }
     };
 
-    socket.on("message_display", handleMessages);
+    socket.on("conversation_history", handleHistory);
+    socket.on("new_message", handleNew);
 
     return () => {
-      socket.off("message_display", handleMessages);
+      socket.off("conversation_history", handleHistory);
+      socket.off("new_message", handleNew);
     };
-  }, [user.uid, car, driver]);
+  }, [user, car, driver, socket]);
 
   const sendMessage = () => {
-    if(!user || !user.uid) {
-      alert("kindly login first");
-    }
-    if(!message.trim()) return;
+    if (!message.trim()) return;
 
-    if(driver === user.uid) {
-      alert("you cant fucking chat with your own dumbass");
+    if (driver === user.uid) {
+      alert("You can't chat with your own listing");
       return;
     }
-    const msgData = {
+
+    const payload = {
       carId: car,
       driverId: driver,
       userId: user.uid,
-      message,
-      sender: user.name,
-      time: new Date(),
+      text: message,
+      sender: user.name || user.displayName || user.email,
+      senderId: user.uid,
+      time: new Date().toISOString(),
     };
 
-    socket.emit("send_message", msgData );
+    socket.emit("send_message", payload);
+    // optimistic update (server will also emit new_message)
+    setMessages((prev) => [...prev, { ...payload, time: new Date(payload.time) }]);
     setMessage("");
   };
 
@@ -63,27 +81,41 @@ export default function Chat({ chatRef, user, owner, car, driver, setShowChat })
     >
       <div className="flex justify-between bg-panel p-4">
         <div>
-          <h1 className="text-base sm:text-xl md:text-2xl font-bold">
-            {owner?.name}
-          </h1>
+          <h1 className="text-base sm:text-xl md:text-2xl font-bold">{owner?.name || "Owner"}</h1>
         </div>
         <button onClick={() => setShowChat(false)}>
           <MdClose className="cursor-pointer text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
         </button>
       </div>
-      <div className="flex-1">
-        {messageSent.map((msg, index) => {
-          return <p key={index}> {msg.message}</p>;
-        })}
+
+      <div ref={listRef} className="flex-1 p-3 overflow-y-auto">
+        {messages.length === 0 ? (
+          <p className="text-gray-500 text-center mt-4">No messages yet</p>
+        ) : (
+          messages.map((m, i) => {
+            const time = m.time ? new Date(m.time).toLocaleString() : "";
+            const amISender = m.senderId === user.uid;
+            return (
+              <div key={i} className={`mb-3 flex ${amISender ? "justify-end" : "justify-start"}`}>
+                <div className={`p-3 rounded-xl max-w-[70%] ${amISender ? "bg-blue-500 text-white" : "bg-gray-300 text-black"}`}>
+                  <div className="text-xs font-semibold">{m.sender}</div>
+                  <div>{m.text}</div>
+                  <div className="text-xs text-right opacity-60 mt-1">{time}</div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
+
       <div className="flex bg-panel justify-between gap-2 items-center p-3">
         <textarea
           className="w-[85%] h-[6vh] text-normal placeholder-[var(--color-label)] text-base sm:text-xl md:text-2xl bg-second p-2 rounded-md"
-          placeholder="kindly type your message!"
+          placeholder="Type your message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
-            if(e.key === "Enter" && !e.shiftKey) {
+            if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               sendMessage();
             }
