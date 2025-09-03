@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
 import { Server as SocketServer } from "socket.io";
+import clientPromise from "./lib/mongodb.js";
 
 import userRoutes from "./routes/userRoutes.js";
 import userGet from "./routes/userGet.js";
@@ -47,6 +48,8 @@ app.use("/api/register", regRoute);
 app.use("/api/register", regGet);
 app.use("/api/images", imageRoute);
 
+
+
 io.on("connection", (socket) => {
   socket.on("join_room", ({ carId, driverId, userId }) => {
     const roomId = `${carId}_${driverId}_${userId}`;
@@ -54,10 +57,20 @@ io.on("connection", (socket) => {
     console.log(`User ${socket.id} joined room: ${roomId}`);
   });
 
-  socket.on("send_message", (data) => {
-    const { carId, driverId, userId, message, sender, time } = data;
-    const roomId = `${carId}_${driverId}_${userId}`;
-    io.to(roomId).emit("message_display", { message, sender, time });
+  socket.on("send_message", async (data) => {
+    const roomId = `${data.carId}_${data.driverId}_${data.userId}`;
+
+    const client = await clientPromise;
+    const db = client.db("arqila");
+
+    await db.collection("messages").insertOne({
+      carId: data.carId,
+      message: data.message,
+      sender: data.sender,
+      time: new Date(),
+    })
+
+    io.to(roomId).emit("message_display", { message: data.message, sender: data.sender, time: data.time });
   });
 });
 

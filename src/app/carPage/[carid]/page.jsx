@@ -36,7 +36,7 @@ export default function CarPage() {
       if(loggedIn) {
         setCurrentUser({
           uid: loggedIn.uid,
-          name: loggedIn.name,
+          name: loggedIn.displayName,
           email: loggedIn.email,
           photo: loggedIn.photoURL,
         });
