@@ -8,7 +8,7 @@ import {
   FaSignInAlt,
 } from "react-icons/fa";
 import { RiLoginBoxLine } from "react-icons/ri";
-import { MdEmail } from "react-icons/md";
+import { MdChat, MdEmail } from "react-icons/md";
 import { useRef, useState, useEffect } from "react";
 import GetStarted from "@/components/ctaOne";
 import SignUp from "@/components/signup";
@@ -169,6 +169,10 @@ export default function Hero() {
                     ignition
                   </span>
                 </a>
+              </div>
+
+              <div>
+                <a href="/chat"><MdChat /></a>
               </div>
 
               <div className="flex items-center justify-center group">
