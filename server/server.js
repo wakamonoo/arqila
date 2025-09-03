@@ -48,33 +48,16 @@ app.use("/api/register", regGet);
 app.use("/api/images", imageRoute);
 
 io.on("connection", (socket) => {
-  console.log("⚡ New connection:", socket.id);
-
-  // User joins their personal room
-  socket.on("joinUserRoom", (userId) => {
-    socket.join(`user_${userId}`);
-    console.log(`User joined room: user_${userId}`);
+  socket.on("join_room", ({ carId, driverId, userId }) => {
+    const roomId = `${carId}_${driverId}_${userId}`;
+    socket.join(roomId);
+    console.log(`User ${socket.id} joined room: ${roomId}`);
   });
 
-  // Driver joins their personal room
-  socket.on("joinDriverRoom", (driverId) => {
-    socket.join(`driver_${driverId}`);
-    console.log(`Driver joined room: driver_${driverId}`);
-  });
-
-  // Handle sending messages
-  socket.on("sendMessage", (data) => {
-    console.log("📩 Message:", data);
-
-    // Send to driver
-    io.to(`driver_${data.driverId}`).emit("receiveMessage", data);
-
-    // Send to user
-    io.to(`user_${data.userId}`).emit("receiveMessage", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("❌ Disconnected:", socket.id);
+  socket.on("send_message", (data) => {
+    const { carId, driverId, userId, message, sender, time } = data;
+    const roomId = `${carId}_${driverId}_${userId}`;
+    io.to(roomId).emit("message_display", { message, sender, time });
   });
 });
 
