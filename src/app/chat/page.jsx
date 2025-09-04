@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { MdSend } from "react-icons/md";
 import { auth } from "@/firebase/firebaseConfig";
 import { io } from "socket.io-client";
+import { FaArrowLeft } from "react-icons/fa";
 const BASE_URL =
   process.env.NODE_ENV === "production"
     ? "https://arqila.onrender.com"
@@ -134,14 +135,23 @@ export default function ArqChat() {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="bg-panel w-32">
-        <h2 className="font-bold text-header text-xl flex justify-center">arqchat</h2>
+      <aside className="w-30 flex-shrink-0">
+        <div className="flex justify-center items-center gap-2 p-1">
+          <a href="/">
+            <FaArrowLeft className="cursor-pointer text-xl" />
+          </a>
+          <h2 className="font-bold text-header text-xl flex justify-center">
+            arqchat
+          </h2>
+        </div>
         {!driver ? (
           <p>fuck u are not a fucking driver</p>
         ) : (
           <div>
-            <p className="font-semibold text-base px-2 uppercase ">{driver.name}</p>
-            <div className="flex flex-col gap-2 mt-4">
+            <p className="font-semibold text-sm px-2 uppercase leading-3.5 flex justify-center">
+              Hey Driver!
+            </p>
+            <div className="flex flex-col gap-2 mt-4 p-1">
               {convos.length === 0 ? (
                 <p>no convo yet</p>
               ) : (
@@ -154,10 +164,12 @@ export default function ArqChat() {
                         carId: chat.carId,
                       })
                     }
-                    className="bg-second p-2"
+                    className="bg-highlight rounded p-2"
                   >
-                    <p className="text-base font-semibold">{chat.sender || chat.userId}</p>
-                    <p className="text-sm text-label">{chat.lastMessage}</p>
+                    <p className="text-sm font-bold leading-3">
+                      {chat.sender || chat.userId}
+                    </p>
+                    <p className="text-sm text-normal">{chat.lastMessage}</p>
                     <p className="text-xs text-label">
                       {chat.time ? new Date(chat.time).toLocaleString() : ""}
                     </p>
@@ -169,14 +181,20 @@ export default function ArqChat() {
         )}
       </aside>
 
-      <main>
-        <h3>
-          {active
-            ? `conversation: ${active.userId} / ${active.carId}`
-            : "select conversation"}
-        </h3>
+      <main className="flex-1 flex flex-col h-screen bg-panel">
+        <div className="bg-highlight p-2">
+          <p className="text-base text-normal font-semibold">
+            {" "}
+            {active
+              ? convos.find(
+                  (chat) =>
+                    chat.userId === active.userId && chat.carId === active.carId
+                )?.sender || active.userId
+              : "select conversation"}{" "}
+          </p>
+        </div>
 
-        <div ref={listRef}>
+        <div ref={listRef} className="flex-1 overflow-y-auto p-4">
           {messages.length === 0 ? (
             <p>no fucking message yet</p>
           ) : (
@@ -184,25 +202,28 @@ export default function ArqChat() {
               <div
                 key={index}
                 className={`mb-3 flex ${
-                  msg.sender === driver.uid ? "justify-end" : "justify-start"
+                  msg.senderId === driver.uid ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
-                  className={`${
-                    msg.sender === driver.uid ? "bg-amber-300" : "bg-amber-950"
+                  className={`p-2 rounded ${
+                    msg.senderId === driver.uid ? "bg-second" : "bg-chat"
                   }`}
                 >
-                  <h4>{msg.sender}</h4>
-                  <p>{msg.text}</p>
-                  <p>{msg.time ? new Date(msg.time).toLocaleString() : ""}</p>
+                  <p className="text-sm font-semibold">{msg.sender}</p>
+                  <p className="text-base">{msg.text}</p>
+                  <p className="text-label text-xs">
+                    {msg.time ? new Date(msg.time).toLocaleString() : ""}
+                  </p>
                 </div>
               </div>
             ))
           )}
         </div>
 
-        <div>
+        <div className="flex gap-1 p-1 bg-highlight mt-auto w-full">
           <textarea
+            className="text-base rounded px-2 bg-second flex-1"
             placeholder={
               active ? "write a reply.." : "open convsation to reply"
             }
@@ -216,8 +237,12 @@ export default function ArqChat() {
               }
             }}
           ></textarea>
-          <button>
-            <MdSend onClick={sendReply} disabled={!active} />
+          <button
+            onClick={sendReply}
+            disabled={!active}
+            className="bg-second rounded cursor-pointer p-2"
+          >
+            <MdSend className="text-xl" />
           </button>
         </div>
       </main>

@@ -15,6 +15,7 @@
     --color-accent: #00bfff; /* Electric blue (headers/accents) */
     --color-text: #e2e8f0;
     --color-label: #6B7280;
+    --color-dark-teal: #0b3d91;
 
     --color-highlight: #00a8e8; /* Strong blue CTAs */
     --color-highlight-hover: #00b4d8;
@@ -61,6 +62,10 @@
 
   .bg-second {
     background-color: var(--color-secondary);
+  }
+
+  .bg-chat {
+    background-color: var(--color-dark-teal);
   }
 
   .bg-highlight {
