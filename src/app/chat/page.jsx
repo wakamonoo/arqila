@@ -168,7 +168,7 @@ export default function ArqChat() {
   }, [active, driver]);
 
   return (
-    <div className="flex flex-col" style={{ height: "100dvh" }}>
+    <div className="flex flex-col h-screen">
       <aside className={`bg-brand ${active ? "hidden" : "w-full"}`}>
         <div className="flex justify-between items-center gap-2 p-4">
           <a href="/">
@@ -231,7 +231,7 @@ export default function ArqChat() {
       </aside>
 
       <main
-        className={`flex flex-col bg-second ${active ? "w-full" : "hidden"}`}
+        className={`flex flex-col bg-second ${active ? "w-full" : "hidden"}`} style={{ height: "100dvh" }}
       >
         <div className="bg-panel p-4 flex gap-8 items-center">
           <button onClick={() => setActive(null)}>
@@ -274,7 +274,7 @@ export default function ArqChat() {
           )}
         </div>
 
-        <div className="flex gap-1 p-2 pb-[env(safe-area-inset-bottom)] bg-panel w-full">
+        <div className="flex gap-1 p-2 bg-panel w-full">
           <textarea
             className="text-base rounded px-2 bg-second flex-1"
             placeholder={
