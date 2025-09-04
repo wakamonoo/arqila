@@ -149,7 +149,7 @@ export default function ArqChat() {
     : null;
 
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex min-h-[100vh] w-screen">
       <aside className={`bg-brand ${active ? "hidden" : "w-full"}`}>
         <div className="flex justify-between items-center gap-2 p-4">
           <a href="/">
