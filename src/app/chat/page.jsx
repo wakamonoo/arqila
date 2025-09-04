@@ -25,6 +25,7 @@ export default function ArqChat() {
   const [reply, setReply] = useState("");
   const listRef = useRef(null);
   const [loader, setLoader] = useState(false);
+  const [cName, setCName] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -148,8 +149,26 @@ export default function ArqChat() {
       )
     : null;
 
+  useEffect(() => {
+    if (!active || !driver) return;
+
+    const fetchCarName = async () => {
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/carName/carNameGet?carId=${active.carId}&userId=${active.userId}&driverId=${driver.uid}`
+        );
+        const data = await res.json();
+        setCName(data.carName);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCarName();
+  }, [active, driver]);
+
   return (
-    <div className="flex min-h-[100vh] w-screen">
+    <div className="flex flex-col" style={{ height: "100dvh" }}>
       <aside className={`bg-brand ${active ? "hidden" : "w-full"}`}>
         <div className="flex justify-between items-center gap-2 p-4">
           <a href="/">
@@ -218,9 +237,9 @@ export default function ArqChat() {
           <button onClick={() => setActive(null)}>
             <FaArrowLeft />
           </button>
-          <p className="text-base text-normal font-semibold">
+          <p className="text-base text-normal font-semibold truncate w-80">
             {active ? convo?.sender || active.userId : "select conversation"} |{" "}
-            {active ? convo?.carName || "carname" : "select conversation"}
+            {active ? cName || "carname" : "select conversation"}
           </p>
         </div>
 
@@ -255,7 +274,7 @@ export default function ArqChat() {
           )}
         </div>
 
-        <div className="flex gap-1 p-2 bg-panel w-full">
+        <div className="flex gap-1 p-2 pb-[env(safe-area-inset-bottom)] bg-panel w-full">
           <textarea
             className="text-base rounded px-2 bg-second flex-1"
             placeholder={

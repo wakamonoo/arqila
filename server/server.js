@@ -12,6 +12,8 @@ import carGet from "./routes/carGet.js";
 import imageRoute from "./routes/imageRoute.js";
 import regRoute from "./routes/regRoute.js";
 import regGet from "./routes/regGet.js";
+import carNameGet from "./routes/carNameGet.js";
+
 
 dotenv.config();
 
@@ -47,6 +49,7 @@ app.use("/api/cars", carGet);
 app.use("/api/register", regRoute);
 app.use("/api/register", regGet);
 app.use("/api/images", imageRoute);
+app.use("/api/carName", carNameGet);
 
 async function messsageCollection() {
   const client = await clientPromise;
