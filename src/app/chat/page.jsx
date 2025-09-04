@@ -142,6 +142,12 @@ export default function ArqChat() {
     setReply("");
   };
 
+  const convo = active
+    ? convos.find(
+        (chat) => chat.userId === active.userId && chat.carId === active.carId
+      )
+    : null;
+
   return (
     <div className="flex h-screen w-screen">
       <aside className={`bg-brand ${active ? "hidden" : "w-full"}`}>
@@ -208,24 +214,13 @@ export default function ArqChat() {
       <main
         className={`flex flex-col bg-second ${active ? "w-full" : "hidden"}`}
       >
-        <div className="bg-panel p-2 flex gap-2 items-center">
+        <div className="bg-panel p-4 flex gap-8 items-center">
           <button onClick={() => setActive(null)}>
             <FaArrowLeft />
           </button>
           <p className="text-base text-normal font-semibold">
-            {active
-              ? convos.find(
-                  (chat) =>
-                    chat.userId === active.userId && chat.carId === active.carId
-                )?.sender || active.userId
-              : "select conversation"}{" "}
-            |{" "}
-            {active
-              ? convos.find(
-                  (chat) =>
-                    chat.userId === active.userId && chat.carId === active.carId
-                )?.carName || "carname"
-              : "select conversation"}
+            {active ? convo?.sender || active.userId : "select conversation"} |{" "}
+            {active ? convo?.carName || "carname" : "select conversation"}
           </p>
         </div>
 
