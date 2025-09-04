@@ -95,6 +95,7 @@ io.on("connection", (socket) => {
             lastMessage: { $first: "$text"},
             sender: { $first: "$sender"},
             time: { $first: "$time" },
+            carName: { $first: "$carName" },
           },
         },
         {
@@ -105,6 +106,7 @@ io.on("connection", (socket) => {
             lastMessage: 1,
             sender: 1,
             time: 1,
+            carName: 1,
           },
         },
         { $sort: { time: -1 } }
@@ -119,7 +121,7 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", async (data) => {
     try {
-      const { carId, driverId, userId, text, sender, senderId } = data;
+      const { carId, carName, driverId, userId, text, sender, senderId } = data;
       if (!carId || !driverId || !userId || !text) {
         console.warn("send_message is missing fields", data);
         return;
@@ -127,6 +129,7 @@ io.on("connection", (socket) => {
 
       const msg = {
         carId,
+        carName,
         driverId,
         userId,
         text,
@@ -140,6 +143,8 @@ io.on("connection", (socket) => {
 
       const room = convoRoomId({ carId, driverId, userId });
       io.to(room).emit("new_message", msg);
+      const driverRoom = `driver_${driverId}`;
+      io.to(driverRoom).emit("new_message", msg);
     } catch (err) {
       console.error("send_message error", err);
     }

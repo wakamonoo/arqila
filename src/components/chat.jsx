@@ -14,6 +14,7 @@ export default function Chat({
   user,
   owner,
   car,
+  carName,
   driver,
   setShowChat,
 }) {
@@ -63,13 +64,9 @@ export default function Chat({
       alert("kindly login first");
     }
     
-
-    if (driver === user.uid) {
-      alert("you cant fucking chat with your own dumbass");
-      return;
-    }
     const messageData = {
       carId: car,
+      carName: carName,
       driverId: driver,
       userId: user.uid,
       text: message,
@@ -98,7 +95,7 @@ export default function Chat({
         </button>
       </div>
 
-      <div ref={listRef} className="flex-1 p-4">
+      <div ref={listRef} className="flex-1 overflow-auto p-4">
         {messages.length === 0 ? (
           <p>no messages yet</p>
         ) : (
@@ -107,10 +104,10 @@ export default function Chat({
             const isMe = msg.senderId === user.uid;
             return (
               <div key={index} className={`mb-3 flex ${isMe? "justify-end"  : "justify-start"}`}>
-                <div className={`p-3 rounded-xl max-w-[70%] ${isMe ? "bg-blue-500" : "bg-amber-600"}`}>
-                  <p>{msg.sender}</p>
-                  <p>{msg.text}</p>
-                  <p>{time}</p>
+                <div className={`p-3 rounded-xl max-w-[70%] ${isMe ? "bg-brand" : "bg-panel"}`}>
+                  <p className="text-sm font-semibold">{msg.sender}</p>
+                  <p className="text-base">{msg.text}</p>
+                  <p className="text-label text-xs">{time}</p>
                 </div>
               </div>
             )

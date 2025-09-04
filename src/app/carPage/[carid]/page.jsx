@@ -273,7 +273,7 @@ export default function CarPage() {
         </div>
 
         {showChat && (
-          <Chat chatRef={chatRef} user={currentUser} owner={user} car={carid} driver={car?.uid} setShowChat={setShowChat} />
+          <Chat chatRef={chatRef} user={currentUser} owner={user} car={carid} carName={car?.car} driver={car?.uid} setShowChat={setShowChat} />
         )}
       </div>
     </div>
