@@ -12,7 +12,7 @@ import carGet from "./routes/carGet.js";
 import imageRoute from "./routes/imageRoute.js";
 import regRoute from "./routes/regRoute.js";
 import regGet from "./routes/regGet.js";
-import carNameGet from "./routes/carNameGet.js";
+import convoGet from "./routes/convoGet.js";
 
 
 dotenv.config();
@@ -49,7 +49,7 @@ app.use("/api/cars", carGet);
 app.use("/api/register", regRoute);
 app.use("/api/register", regGet);
 app.use("/api/images", imageRoute);
-app.use("/api/carName", carNameGet);
+app.use("/api/convo", convoGet);
 
 async function messsageCollection() {
   const client = await clientPromise;
@@ -98,7 +98,6 @@ io.on("connection", (socket) => {
             lastMessage: { $first: "$text"},
             sender: { $first: "$sender"},
             time: { $first: "$time" },
-            carName: { $first: "$carName" },
           },
         },
         {
@@ -109,7 +108,6 @@ io.on("connection", (socket) => {
             lastMessage: 1,
             sender: 1,
             time: 1,
-            carName: 1,
           },
         },
         { $sort: { time: -1 } }

@@ -25,7 +25,6 @@ export default function ArqChat() {
   const [reply, setReply] = useState("");
   const listRef = useRef(null);
   const [loader, setLoader] = useState(false);
-  const [cName, setCName] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -144,28 +143,31 @@ export default function ArqChat() {
   };
 
   const convo = active
-    ? convos.find(
-        (chat) => chat.userId === active.userId && chat.carId === active.carId
-      )
+    ? convos.find((c) => c.userId === active.userId && c.carId === active.carId)
     : null;
 
   useEffect(() => {
-    if (!active || !driver) return;
+    if (!driver?.uid) return;
 
-    const fetchCarName = async () => {
-      try {
-        const res = await fetch(
-          `${BASE_URL}/api/carName/carNameGet?carId=${active.carId}&userId=${active.userId}&driverId=${driver.uid}`
-        );
-        const data = await res.json();
-        setCName(data.carName);
-      } catch (err) {
-        console.error(err);
-      }
+    const fetchConvoSenders = async () => {
+      const convosWithSenders = await Promise.all(
+        convos.map(async (chat) => {
+          const res = await fetch(
+            `${BASE_URL}/api/convo/convoGet?carId=${chat.carId}&userId=${chat.userId}&driverId=${driver.uid}`
+          );
+          const data = await res.json();
+          return {
+            ...chat,
+            senderName: data.senderName,
+            carName: data.carName,
+          };
+        })
+      );
+      setConvos(convosWithSenders);
     };
 
-    fetchCarName();
-  }, [active, driver]);
+    fetchConvoSenders();
+  }, [convos, driver]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -214,7 +216,7 @@ export default function ArqChat() {
                     className="bg-second rounded p-4 cursor-pointer duration-200 hover:bg-[var(--color-highlight)] active:bg-[var(--color-highlight)]"
                   >
                     <p className="text-base font-bold leading-3">
-                      {chat.sender || chat.userId}
+                      {chat.senderName || chat.userId}
                     </p>
                     <p className="text-base py-2 text-normal">
                       {chat.lastMessage}
@@ -231,15 +233,15 @@ export default function ArqChat() {
       </aside>
 
       <main
-        className={`flex flex-col bg-second ${active ? "w-full" : "hidden"}`} style={{ height: "100dvh" }}
+        className={`flex flex-col bg-second ${active ? "w-full" : "hidden"}`}
+        style={{ height: "100dvh" }}
       >
         <div className="bg-panel p-4 flex gap-8 items-center">
           <button onClick={() => setActive(null)}>
             <FaArrowLeft />
           </button>
           <p className="text-base text-normal font-semibold truncate w-80">
-            {active ? convo?.sender || active.userId : "select conversation"} |{" "}
-            {active ? cName || "carname" : "select conversation"}
+            {convo?.senderName} | {convo?.carName}
           </p>
         </div>
 
