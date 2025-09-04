@@ -98,7 +98,7 @@ export default function Chat({
         </button>
       </div>
 
-      <div ref={listRef} className="flex-1">
+      <div ref={listRef} className="flex-1 p-4">
         {messages.length === 0 ? (
           <p>no messages yet</p>
         ) : (
@@ -107,7 +107,7 @@ export default function Chat({
             const isMe = msg.senderId === user.uid;
             return (
               <div key={index} className={`mb-3 flex ${isMe? "justify-end"  : "justify-start"}`}>
-                <div className={`p-3 rounded-xl max-w-[70%] ${isMe ? "bg-amber-50" : "bg-amber-600"}`}>
+                <div className={`p-3 rounded-xl max-w-[70%] ${isMe ? "bg-blue-500" : "bg-amber-600"}`}>
                   <p>{msg.sender}</p>
                   <p>{msg.text}</p>
                   <p>{time}</p>
