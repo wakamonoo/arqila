@@ -23,10 +23,10 @@ export default function Chat({
   const listRef = useRef(null);
 
   useEffect(() => {
-    if(listRef.current) {
+    if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
-  }, [messages])
+  }, [messages]);
 
   useEffect(() => {
     if (!user || !user.uid) return;
@@ -63,7 +63,7 @@ export default function Chat({
     if (!user || !user.uid) {
       alert("kindly login first");
     }
-    
+
     const messageData = {
       carId: car,
       carName: carName,
@@ -97,24 +97,33 @@ export default function Chat({
 
       <div ref={listRef} className="flex-1 overflow-auto p-4">
         {messages.length === 0 ? (
-          <p>no messages yet</p>
+          <div className="flex justify-center items-center h-full">
+            <p className="text-xs text-label">no messages</p>
+          </div>
         ) : (
           messages.map((msg, index) => {
             const time = msg.time ? new Date(msg.time).toLocaleString() : "";
             const isMe = msg.senderId === user.uid;
             return (
-              <div key={index} className={`mb-3 flex ${isMe? "justify-end"  : "justify-start"}`}>
-                <div className={`p-3 rounded-xl max-w-[70%] ${isMe ? "bg-brand" : "bg-panel"}`}>
+              <div
+                key={index}
+                className={`mb-3 flex ${
+                  isMe ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`p-3 rounded-xl max-w-[70%] ${
+                    isMe ? "bg-brand" : "bg-panel"
+                  }`}
+                >
                   <p className="text-sm font-semibold">{msg.sender}</p>
                   <p className="text-base">{msg.text}</p>
                   <p className="text-label text-xs">{time}</p>
                 </div>
               </div>
-            )
+            );
           })
-        )
-
-        }
+        )}
       </div>
 
       <div className="flex bg-panel justify-between gap-2 items-center p-3">

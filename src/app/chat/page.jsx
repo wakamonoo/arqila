@@ -1,9 +1,15 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { MdSend } from "react-icons/md";
+import Loader from "@/components/loader";
 import { auth } from "@/firebase/firebaseConfig";
 import { io } from "socket.io-client";
-import { FaArrowLeft, FaHandPaper } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaHandPaper,
+  FaInbox,
+  FaUserAltSlash,
+} from "react-icons/fa";
 const BASE_URL =
   process.env.NODE_ENV === "production"
     ? "https://arqila.onrender.com"
@@ -18,6 +24,7 @@ export default function ArqChat() {
   const [messages, setMessages] = useState([]);
   const [reply, setReply] = useState("");
   const listRef = useRef(null);
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -38,11 +45,13 @@ export default function ArqChat() {
 
   useEffect(() => {
     if (!driver?.uid) return;
+    setLoader(true);
 
     socket.emit("join_driver", { driverId: driver.uid });
 
     const onConvos = (data) => {
       setConvos(data || []);
+      setLoader(false);
     };
 
     const onNewMessage = (msg) => {
@@ -146,15 +155,27 @@ export default function ArqChat() {
           <div />
         </div>
         {!driver ? (
-          <p>fuck u are not a fucking driver</p>
+          <div className="flex flex-col gap-2 justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <FaUserAltSlash className="text-7xl sm:text-8xl md:text-9xl" />
+            <p className="text-header text-base sm:text-xl md:text-2xl font-bold">
+              kindly login first
+            </p>
+          </div>
         ) : (
           <div>
             <p className="font-semibold text-base px-2 uppercase -mt-4 flex justify-center">
               Hey {driver.name}!
             </p>
             <div className="flex flex-col gap-2 mt-4 p-4">
-              {convos.length === 0 ? (
-                <p>no convo yet</p>
+              {loader ? (
+                <Loader />
+              ) : convos.length === 0 ? (
+                <div className="flex flex-col gap-2 justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <FaInbox className="text-7xl sm:text-8xl md:text-9xl" />
+                  <p className="text-header text-base sm:text-xl md:text-2xl font-bold">
+                    no messages yet
+                  </p>
+                </div>
               ) : (
                 convos.map((chat, targetIndex) => (
                   <div
@@ -170,7 +191,9 @@ export default function ArqChat() {
                     <p className="text-base font-bold leading-3">
                       {chat.sender || chat.userId}
                     </p>
-                    <p className="text-base py-2 text-normal">{chat.lastMessage}</p>
+                    <p className="text-base py-2 text-normal">
+                      {chat.lastMessage}
+                    </p>
                     <p className="text-xs text-label flex justify-end">
                       {chat.time ? new Date(chat.time).toLocaleString() : ""}
                     </p>
@@ -195,7 +218,9 @@ export default function ArqChat() {
                   (chat) =>
                     chat.userId === active.userId && chat.carId === active.carId
                 )?.sender || active.userId
-              : "select conversation"} | {active
+              : "select conversation"}{" "}
+            |{" "}
+            {active
               ? convos.find(
                   (chat) =>
                     chat.userId === active.userId && chat.carId === active.carId
@@ -205,8 +230,12 @@ export default function ArqChat() {
         </div>
 
         <div ref={listRef} className="flex-1 overflow-y-auto p-4 min-h-0">
-          {messages.length === 0 ? (
-            <p>no fucking message yet</p>
+          {loader ? (
+            <Loader />
+          ) : messages.length === 0 ? (
+            <div className="flex justify-center items-center h-full">
+              <p className="text-xs text-label">no messages</p>
+            </div>
           ) : (
             messages.map((msg, index) => (
               <div
