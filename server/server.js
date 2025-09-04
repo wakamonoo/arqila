@@ -78,7 +78,46 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("send_message", async(data) => {
+  socket.on("join_driver", async ({ driverId }) => {
+    try {
+      if (!driverId) return;
+      const driverRoom = `driver_${driverId}`;
+      socket.join(driverRoom);
+      console.log(`socket ${socket.id} joined driver room ${driverRoom}`);
+
+      const col = await messsageCollection();
+      const pipeline = [
+        { $match: {driverId} },
+        { $sort: { time: -1 } },
+        {
+          $group: {
+            _id: { userId: "$userId", carId: "$carId" },
+            lastMessage: { $first: "$text"},
+            sender: { $first: "$sender"},
+            time: { $first: "$time" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            userId: "$_id.userId",
+            carId: "$_id.carId",
+            lastMessage: 1,
+            sender: 1,
+            time: 1,
+          },
+        },
+        { $sort: { time: -1 } }
+    ]
+
+    const convos = await col.aggregate(pipeline).toArray();
+    socket.emit("driver_conversations", convos);
+    } catch (err) {
+      console.error("driver_conversation error", err)
+    }
+  });
+
+  socket.on("send_message", async (data) => {
     try {
       const { carId, driverId, userId, text, sender, senderId } = data;
       if (!carId || !driverId || !userId || !text) {
@@ -102,7 +141,7 @@ io.on("connection", (socket) => {
       const room = convoRoomId({ carId, driverId, userId });
       io.to(room).emit("new_message", msg);
     } catch (err) {
-      console.error("sen_message error", err);
+      console.error("send_message error", err);
     }
   });
 });
