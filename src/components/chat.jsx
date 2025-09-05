@@ -72,6 +72,7 @@ export default function Chat({
       text: message,
       sender: user.name || user.displayName || user.email,
       senderId: user.uid,
+      client: user.name,
       time: new Date().toISOString(),
     };
 

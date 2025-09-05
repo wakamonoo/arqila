@@ -14,7 +14,6 @@ import regRoute from "./routes/regRoute.js";
 import regGet from "./routes/regGet.js";
 import convoGet from "./routes/convoGet.js";
 
-
 dotenv.config();
 
 const app = express();
@@ -90,13 +89,14 @@ io.on("connection", (socket) => {
 
       const col = await messsageCollection();
       const pipeline = [
-        { $match: {driverId} },
+        { $match: { driverId } },
         { $sort: { time: -1 } },
         {
           $group: {
             _id: { userId: "$userId", carId: "$carId" },
-            lastMessage: { $first: "$text"},
-            sender: { $first: "$sender"},
+            lastMessage: { $first: "$text" },
+            sender: { $first: "$sender" },
+            client: { $first: "$client" },
             time: { $first: "$time" },
           },
         },
@@ -107,22 +107,32 @@ io.on("connection", (socket) => {
             carId: "$_id.carId",
             lastMessage: 1,
             sender: 1,
+            client: 1,
             time: 1,
           },
         },
-        { $sort: { time: -1 } }
-    ]
+        { $sort: { time: -1 } },
+      ];
 
-    const convos = await col.aggregate(pipeline).toArray();
-    socket.emit("driver_conversations", convos);
+      const convos = await col.aggregate(pipeline).toArray();
+      socket.emit("driver_conversations", convos);
     } catch (err) {
-      console.error("driver_conversation error", err)
+      console.error("driver_conversation error", err);
     }
   });
 
   socket.on("send_message", async (data) => {
     try {
-      const { carId, carName, driverId, userId, text, sender, senderId } = data;
+      const {
+        carId,
+        carName,
+        driverId,
+        userId,
+        text,
+        sender,
+        senderId,
+        client,
+      } = data;
       if (!carId || !driverId || !userId || !text) {
         console.warn("send_message is missing fields", data);
         return;
@@ -136,6 +146,7 @@ io.on("connection", (socket) => {
         text,
         sender,
         senderId,
+        client,
         time: data.time ? new Date(data.time) : new Date(),
       };
 

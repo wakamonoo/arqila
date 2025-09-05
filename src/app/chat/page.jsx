@@ -63,18 +63,12 @@ export default function ArqChat() {
           (chat) => chat.userId === msg.userId && chat.carId === msg.carId
         );
 
-        let existingSender;
-
-        if (targetIndex !== -1) {
-          existingSender = copy[targetIndex].sender;
-        } else {
-          existingSender = msg.sender;
-        }
         const item = {
           userId: msg.userId,
           carId: msg.carId,
           lastMessage: msg.text,
-          sender: existingSender,
+          sender: msg.sender,
+          client: msg.client,
           time: msg.time,
         };
         if (targetIndex === -1) {
@@ -144,6 +138,7 @@ export default function ArqChat() {
       text: reply,
       sender: driver.name,
       senderId: driver.uid,
+      client: convo?.client,
       time: new Date().toISOString(),
     };
 
@@ -222,7 +217,7 @@ export default function ArqChat() {
                     className="bg-second rounded p-4 cursor-pointer duration-200 hover:bg-[var(--color-highlight)] active:bg-[var(--color-highlight)]"
                   >
                     <p className="text-base font-bold leading-3">
-                      {chat.sender || chat.userId}
+                      {chat.client || chat.userId}
                     </p>
                     <p className="text-base py-2 text-normal">
                       {chat.lastMessage}
@@ -244,10 +239,10 @@ export default function ArqChat() {
       >
         <div className="bg-panel p-4 flex gap-8 items-center">
           <button onClick={() => setActive(null)}>
-            <FaArrowLeft />
+            <FaArrowLeft className="cursor-pointer text-2xl" />
           </button>
           <p className="text-base text-normal font-semibold truncate w-80">
-            {active ? convo?.sender || active.userId : "select conversation"} |{" "}
+            {active ? convo?.client || active.userId : "select conversation"} |{" "}
             {active ? carName || "carname" : "select conversation"}
           </p>
         </div>
