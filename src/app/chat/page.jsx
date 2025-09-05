@@ -190,8 +190,8 @@ export default function ArqChat() {
   }, [active, driver]);
 
   return (
-    <div className="flex flex-col h-screen">
-      <aside className={`bg-brand ${active ? "hidden" : "w-full"}`}>
+    <div className="flex  h-screen">
+      <aside className={`bg-brand md:w-[28%] ${active ? "hidden md:flex md:flex-col" : "w-full"}`}>
         <div className="flex justify-between items-center gap-2 p-4">
           <a href="/">
             <FaArrowLeft className="text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
@@ -210,10 +210,10 @@ export default function ArqChat() {
           </div>
         ) : (
           <div>
-            <p className="font-semibold text-base sm:text-xl md:text-2xl px-2 uppercase -mt-4 flex justify-center">
+            <p className="font-semibold text-base text-center leading-5 sm:text-xl md:text-2xl px-2 uppercase -mt-4 md:-mt-2 flex justify-center">
               Hey {driver.name}!
             </p>
-            <div className="flex flex-col gap-2 mt-4 p-8">
+            <div className="flex flex-col gap-2 mt-4 p-8 md:p-2">
               {loader ? (
                 <Loader />
               ) : convos.length === 0 ? (
@@ -235,14 +235,14 @@ export default function ArqChat() {
                     }
                     className="bg-second rounded p-4 cursor-pointer duration-200 hover:bg-[var(--color-highlight)] active:bg-[var(--color-highlight)]"
                   >
-                    <p className="text-base sm:text-xl md:text-2xl font-bold leading-3">
+                    <p className="text-base sm:text-xl md:text-2xl font-bold leading-5">
                       {chat.client || chat.userId}
                     </p>
-                    <div className="flex items-center gap-1">
-                      <p className="font-light text-sm sm:text-base md:text-xl">
+                    <div className="flex gap-1 items-end py-4">
+                      <p className="font-light text-sm sm:text-base md:text-xl leading-6 sm:leading-9 md:leading-8">
                         {chat.senderId === chat.driverId ? "you:" : ""}
                       </p>
-                      <p className="text-base sm:text-xl md:text-2xl py-2 text-normal">
+                      <p className="text-base sm:text-xl md:text-2xl py-2 text-normal line-clamp-1 h-8 sm:h-10">
                         {chat.lastMessage}
                       </p>
                     </div>
@@ -258,14 +258,14 @@ export default function ArqChat() {
       </aside>
 
       <main
-        className={`flex flex-col bg-second ${active ? "w-full" : "hidden"}`}
+        className={`flex flex-col bg-second md:w-[72%] ${active ? "w-full" : "hidden md:flex"}`}
         style={{ height: "100dvh" }}
       >
         <div className="bg-panel p-4 flex gap-8 items-center">
-          <button onClick={() => setActive(null)}>
+          <button onClick={() => setActive(null)} className="flex md:hidden">
             <FaArrowLeft className="text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
           </button>
-          <div className="flex flex-col">
+          <div className="flex flex-col md:px-4 lg:px-8">
             <p className="text-base sm:text-xl md:text-2xl leading-3.5">{active ? convo?.client || active.userId : "select conversation"}</p>
             <p className="text-xs sm:text-sm md:text-base text-label">{active ? carName || "carname" : "select conversation"}</p>
           </div>
@@ -287,13 +287,13 @@ export default function ArqChat() {
                 }`}
               >
                 <div
-                  className={`p-3 rounded-xl max-w-[70%] ${
+                  className={`p-4 md:p-6 rounded-xl max-w-[70%] ${
                     msg.senderId === driver.uid ? "bg-brand" : "bg-panel"
                   }`}
                 >
-                  <p className="text-label text-sm sm:text-base md:text-xl font-semibold flex justify-end">{msg.sender}</p>
+                  <p className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${msg.senderId === driver.uid ? "justify-end" : "justify-start"}`}>{msg.sender}</p>
                   <p className="text-base sm:text-xl md:text-2xl py-4">{msg.text}</p>
-                  <p className="text-label text-xs sm:text-sm md:text-base flex justify-end">
+                  <p className={`text-label text-xs sm:text-sm md:text-base flex ${msg.senderId === driver.uid ? "justify-end" : "justify-start"}`}>
                     {msg.time ? new Date(msg.time).toLocaleString() : ""}
                   </p>
                 </div>
