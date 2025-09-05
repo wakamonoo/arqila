@@ -68,6 +68,8 @@ export default function ArqChat() {
           carId: msg.carId,
           lastMessage: msg.text,
           sender: msg.sender,
+          senderId: msg.senderId,
+          driverId: msg.driverId,
           client: msg.client,
           time: msg.time,
         };
@@ -219,9 +221,12 @@ export default function ArqChat() {
                     <p className="text-base font-bold leading-3">
                       {chat.client || chat.userId}
                     </p>
-                    <p className="text-base py-2 text-normal">
-                      {chat.lastMessage}
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="font-light text-sm">{chat.senderId === chat.driverId ? ("you:") : "" }</p>
+                      <p className="text-base py-2 text-normal">
+                        {chat.lastMessage}
+                      </p>
+                    </div>
                     <p className="text-xs text-label flex justify-end">
                       {chat.time ? new Date(chat.time).toLocaleString() : ""}
                     </p>
