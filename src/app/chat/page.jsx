@@ -87,9 +87,19 @@ export default function ArqChat() {
         active.userId === msg.userId &&
         active.carId === msg.carId
       ) {
-        setMessages((prev) => [...prev, msg]);
+        setMessages((prev) => {
+          if (
+            prev.some((m) => m.time === msg.time && m.senderId === msg.senderId)
+          ) {
+            return prev;
+          }
+          return [...prev, msg];
+        });
       }
     };
+
+    socket.off("driver_conversations", onConvos);
+    socket.off("new_message", onNewMessage);
 
     socket.on("driver_conversations", onConvos);
     socket.on("new_message", onNewMessage);
@@ -98,7 +108,7 @@ export default function ArqChat() {
       socket.off("driver_conversations", onConvos);
       socket.off("new_message", onNewMessage);
     };
-  }, [driver?.uid, socket, active]);
+  }, [driver?.uid]);
 
   useEffect(() => {
     if (listRef.current) {
@@ -120,7 +130,14 @@ export default function ArqChat() {
 
     const onNew = (msg) => {
       if (msg.carId === carId && msg.userId === userId) {
-        setMessages((prev) => [...prev, msg]);
+        setMessages((prev) => {
+          if (
+            prev.some((m) => m.time === msg.time && m.senderId === msg.senderId)
+          ) {
+            return prev;
+          }
+          return [...prev, msg];
+        });
       }
     };
 
@@ -222,7 +239,9 @@ export default function ArqChat() {
                       {chat.client || chat.userId}
                     </p>
                     <div className="flex items-center gap-1">
-                      <p className="font-light text-sm">{chat.senderId === chat.driverId ? ("you:") : "" }</p>
+                      <p className="font-light text-sm">
+                        {chat.senderId === chat.driverId ? "you:" : ""}
+                      </p>
                       <p className="text-base py-2 text-normal">
                         {chat.lastMessage}
                       </p>
