@@ -25,6 +25,7 @@ export default function ArqChat() {
   const [reply, setReply] = useState("");
   const listRef = useRef(null);
   const [loader, setLoader] = useState(false);
+  const [carName, setCarName] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -61,11 +62,19 @@ export default function ArqChat() {
         const targetIndex = copy.findIndex(
           (chat) => chat.userId === msg.userId && chat.carId === msg.carId
         );
+
+        let existingSender;
+
+        if (targetIndex !== -1) {
+          existingSender = copy[targetIndex].sender;
+        } else {
+          existingSender = msg.sender;
+        }
         const item = {
           userId: msg.userId,
           carId: msg.carId,
           lastMessage: msg.text,
-          sender: msg.sender,
+          sender: existingSender,
           time: msg.time,
         };
         if (targetIndex === -1) {
@@ -143,31 +152,28 @@ export default function ArqChat() {
   };
 
   const convo = active
-    ? convos.find((c) => c.userId === active.userId && c.carId === active.carId)
+    ? convos.find(
+        (chat) => chat.userId === active.userId && chat.carId === active.carId
+      )
     : null;
 
   useEffect(() => {
-    if (!driver?.uid) return;
+    if (!active || !driver) return;
 
-    const fetchConvoSenders = async () => {
-      const convosWithSenders = await Promise.all(
-        convos.map(async (chat) => {
-          const res = await fetch(
-            `${BASE_URL}/api/convo/convoGet?carId=${chat.carId}&userId=${chat.userId}&driverId=${driver.uid}`
-          );
-          const data = await res.json();
-          return {
-            ...chat,
-            senderName: data.senderName,
-            carName: data.carName,
-          };
-        })
-      );
-      setConvos(convosWithSenders);
+    const fetchCarName = async () => {
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/convo/convoGet?carId=${active.carId}&userId=${active.userId}&driverId=${driver.uid}`
+        );
+        const data = await res.json();
+        setCarName(data.carName);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    fetchConvoSenders();
-  }, [convos, driver]);
+    fetchCarName();
+  }, [active, driver]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -216,7 +222,7 @@ export default function ArqChat() {
                     className="bg-second rounded p-4 cursor-pointer duration-200 hover:bg-[var(--color-highlight)] active:bg-[var(--color-highlight)]"
                   >
                     <p className="text-base font-bold leading-3">
-                      {chat.senderName || chat.userId}
+                      {chat.sender || chat.userId}
                     </p>
                     <p className="text-base py-2 text-normal">
                       {chat.lastMessage}
@@ -241,7 +247,8 @@ export default function ArqChat() {
             <FaArrowLeft />
           </button>
           <p className="text-base text-normal font-semibold truncate w-80">
-            {convo?.senderName} | {convo?.carName}
+            {active ? convo?.sender || active.userId : "select conversation"} |{" "}
+            {active ? carName || "carname" : "select conversation"}
           </p>
         </div>
 
