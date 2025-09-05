@@ -194,9 +194,9 @@ export default function ArqChat() {
       <aside className={`bg-brand ${active ? "hidden" : "w-full"}`}>
         <div className="flex justify-between items-center gap-2 p-4">
           <a href="/">
-            <FaArrowLeft className="cursor-pointer text-2xl" />
+            <FaArrowLeft className="text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
           </a>
-          <h2 className="font-bold text-header text-2xl flex justify-center">
+          <h2 className="font-bold text-header text-2xl sm:text-3xl md:text-4xl flex justify-center">
             arqchat
           </h2>
           <div />
@@ -210,10 +210,10 @@ export default function ArqChat() {
           </div>
         ) : (
           <div>
-            <p className="font-semibold text-base px-2 uppercase -mt-4 flex justify-center">
+            <p className="font-semibold text-base sm:text-xl md:text-2xl px-2 uppercase -mt-4 flex justify-center">
               Hey {driver.name}!
             </p>
-            <div className="flex flex-col gap-2 mt-4 p-4">
+            <div className="flex flex-col gap-2 mt-4 p-8">
               {loader ? (
                 <Loader />
               ) : convos.length === 0 ? (
@@ -235,18 +235,18 @@ export default function ArqChat() {
                     }
                     className="bg-second rounded p-4 cursor-pointer duration-200 hover:bg-[var(--color-highlight)] active:bg-[var(--color-highlight)]"
                   >
-                    <p className="text-base font-bold leading-3">
+                    <p className="text-base sm:text-xl md:text-2xl font-bold leading-3">
                       {chat.client || chat.userId}
                     </p>
                     <div className="flex items-center gap-1">
-                      <p className="font-light text-sm">
+                      <p className="font-light text-sm sm:text-base md:text-xl">
                         {chat.senderId === chat.driverId ? "you:" : ""}
                       </p>
-                      <p className="text-base py-2 text-normal">
+                      <p className="text-base sm:text-xl md:text-2xl py-2 text-normal">
                         {chat.lastMessage}
                       </p>
                     </div>
-                    <p className="text-xs text-label flex justify-end">
+                    <p className="text-xs sm:tex-sm md:text-base text-label flex justify-end">
                       {chat.time ? new Date(chat.time).toLocaleString() : ""}
                     </p>
                   </div>
@@ -263,12 +263,12 @@ export default function ArqChat() {
       >
         <div className="bg-panel p-4 flex gap-8 items-center">
           <button onClick={() => setActive(null)}>
-            <FaArrowLeft className="cursor-pointer text-2xl" />
+            <FaArrowLeft className="text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
           </button>
-          <p className="text-base text-normal font-semibold truncate w-80">
-            {active ? convo?.client || active.userId : "select conversation"} |{" "}
-            {active ? carName || "carname" : "select conversation"}
-          </p>
+          <div className="flex flex-col">
+            <p className="text-base sm:text-xl md:text-2xl leading-3.5">{active ? convo?.client || active.userId : "select conversation"}</p>
+            <p className="text-xs sm:text-sm md:text-base text-label">{active ? carName || "carname" : "select conversation"}</p>
+          </div>
         </div>
 
         <div ref={listRef} className="flex-1 overflow-y-auto p-4 min-h-0">
@@ -276,7 +276,7 @@ export default function ArqChat() {
             <Loader />
           ) : messages.length === 0 ? (
             <div className="flex justify-center items-center h-full">
-              <p className="text-xs text-label">no messages</p>
+              <p className="text-xs sm:text-sm md:text-base text-label">no messages</p>
             </div>
           ) : (
             messages.map((msg, index) => (
@@ -291,9 +291,9 @@ export default function ArqChat() {
                     msg.senderId === driver.uid ? "bg-brand" : "bg-panel"
                   }`}
                 >
-                  <p className="text-sm font-semibold">{msg.sender}</p>
-                  <p className="text-base">{msg.text}</p>
-                  <p className="text-label text-xs">
+                  <p className="text-label text-sm sm:text-base md:text-xl font-semibold flex justify-end">{msg.sender}</p>
+                  <p className="text-base sm:text-xl md:text-2xl py-4">{msg.text}</p>
+                  <p className="text-label text-xs sm:text-sm md:text-base flex justify-end">
                     {msg.time ? new Date(msg.time).toLocaleString() : ""}
                   </p>
                 </div>
@@ -304,7 +304,7 @@ export default function ArqChat() {
 
         <div className="flex gap-1 p-2 bg-panel w-full">
           <textarea
-            className="text-base rounded px-2 bg-second flex-1"
+            className="text-base sm:text-xl md:text-2xl rounded px-2 bg-second flex-1"
             placeholder={
               active ? "write a reply.." : "open convsation to reply"
             }
@@ -323,7 +323,7 @@ export default function ArqChat() {
             disabled={!active}
             className="bg-second rounded cursor-pointer p-2"
           >
-            <MdSend className="text-xl" />
+            <MdSend className="text-xl sm:text-2xl md:text-3xl duration-200 hover:scale-110 active:scale-110" />
           </button>
         </div>
       </main>
