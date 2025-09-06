@@ -27,7 +27,6 @@ export default function ArqChat() {
   const listRef = useRef(null);
   const [loader, setLoader] = useState(false);
   const [carName, setCarName] = useState(null);
-  const [refresher, setRefresher] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
@@ -98,8 +97,6 @@ export default function ArqChat() {
         return copy;
       });
 
-      setRefresher((prev) => (!prev));
-
       if (
         active &&
         active.userId === msg.userId &&
@@ -127,7 +124,7 @@ export default function ArqChat() {
       socket.off("driver_conversations", onConvos);
       socket.off("new_message", onNewMessage);
     };
-  }, [user?.uid, role, refresher]);
+  }, [user?.uid, role, active]);
 
   useEffect(() => {
     if (listRef.current) {
@@ -138,9 +135,7 @@ export default function ArqChat() {
   const openConversation = ({ userId, driverId, carId }) => {
     if (!user?.uid) return;
 
-    const resUserId = userId;
-    const resDriverId = driverId;
-    setActive({ userId: resUserId, driverId: resDriverId, carId });
+    setActive({ userId, driverId, carId });
     setMessages([]);
 
     socket.off("conversation_history");
@@ -166,7 +161,7 @@ export default function ArqChat() {
     socket.on("conversation_history", onHistory);
     socket.on("new_message", onNew);
 
-    socket.emit("join_conversation", { carId, driverId: resDriverId, userId: resUserId });
+    socket.emit("join_conversation", { carId, driverId, userId });
   };
 
   const sendReply = () => {
