@@ -18,7 +18,8 @@ const BASE_URL =
 const socket = io.connect(`${BASE_URL}`);
 
 export default function ArqChat() {
-  const [driver, setDriver] = useState(null);
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [convos, setConvos] = useState([]);
   const [active, setActive] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -28,14 +29,23 @@ export default function ArqChat() {
   const [carName, setCarName] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setDriver({
-          uid: user.uid,
-          name: user.displayName || user.email || "Driver",
-        });
+    const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
+      if (authUser) {
+        try{
+          const res = await fetch(`${BASE_URL}/api/users/users/${authUser.uid}`);
+          const dbUser = await res.json();
+
+          setUser({
+            uid: authUser.uid,
+            name: dbUser.name || authUser.displayName || authUser.email,
+          });
+          setRole(dbUser.role)
+        } catch (err) {
+          console.error("failed to fetch user", err);
+        }
       } else {
         setDriver(null);
+        setUser(null);
       }
     });
 
@@ -45,10 +55,14 @@ export default function ArqChat() {
   }, []);
 
   useEffect(() => {
-    if (!driver?.uid) return;
+    if (!user?.uid || !role) return;
     setLoader(true);
 
-    socket.emit("join_driver", { driverId: driver.uid });
+    if(role === "driver") {
+      socket.emit("join_driver", { driverId: user.uid });
+    } else {
+      socket.emit("join_user", { userId: user.uid });
+    }
 
     const onConvos = (data) => {
       setConvos(data || []);
@@ -56,7 +70,7 @@ export default function ArqChat() {
     };
 
     const onNewMessage = (msg) => {
-      if (msg.driverId !== driver.uid) return;
+      if (msg.driverId !== user.uid && msg.userId !== user.uid) return;
       setConvos((prev) => {
         const copy = [...prev];
         const targetIndex = copy.findIndex(
@@ -99,16 +113,17 @@ export default function ArqChat() {
     };
 
     socket.off("driver_conversations", onConvos);
+    socket.off("user_conversations", onConvos);
     socket.off("new_message", onNewMessage);
 
-    socket.on("driver_conversations", onConvos);
+    socket.on(role === "driver" ? "driver_conversations" : "user_conversations", onConvos);
     socket.on("new_message", onNewMessage);
 
     return () => {
       socket.off("driver_conversations", onConvos);
       socket.off("new_message", onNewMessage);
     };
-  }, [driver?.uid]);
+  }, [user?.uid]);
 
   useEffect(() => {
     if (listRef.current) {
@@ -117,7 +132,7 @@ export default function ArqChat() {
   }, [messages]);
 
   const openConversation = ({ userId, carId }) => {
-    if (!driver?.uid) return;
+    if (!user?.uid) return;
     setActive({ userId, carId });
     setMessages([]);
 
@@ -144,19 +159,19 @@ export default function ArqChat() {
     socket.on("conversation_history", onHistory);
     socket.on("new_message", onNew);
 
-    socket.emit("join_conversation", { carId, driverId: driver.uid, userId });
+    socket.emit("join_conversation", { carId, driverId: role === "driver" ? user.uid : active?.driverId, userId });
   };
 
   const sendReply = () => {
-    if (!reply.trim() || !active || !driver) return;
+    if (!reply.trim() || !active || !user) return;
 
     const messageData = {
       carId: active.carId,
-      driverId: driver.uid,
+      driverId: role === "driver" ? user.uid : active?.driverId,
       userId: active.userId,
       text: reply,
-      sender: driver.name,
-      senderId: driver.uid,
+      sender: user.name,
+      senderId: user.uid,
       client: convo?.client,
       time: new Date().toISOString(),
     };
@@ -172,12 +187,12 @@ export default function ArqChat() {
     : null;
 
   useEffect(() => {
-    if (!active || !driver) return;
+    if (!active || !user) return;
 
     const fetchCarName = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}/api/convo/convoGet?carId=${active.carId}&userId=${active.userId}&driverId=${driver.uid}`
+          `${BASE_URL}/api/convo/convoGet?carId=${active.carId}&userId=${active.userId}&driverId=${user.uid}`
         );
         const data = await res.json();
         setCarName(data.carName);
@@ -187,7 +202,7 @@ export default function ArqChat() {
     };
 
     fetchCarName();
-  }, [active, driver]);
+  }, [active, user]);
 
   return (
     <div className="flex  h-screen">
@@ -201,7 +216,7 @@ export default function ArqChat() {
           </h2>
           <div />
         </div>
-        {!driver ? (
+        {!user ? (
           <div className="flex flex-col gap-2 justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <FaUserAltSlash className="text-7xl sm:text-8xl md:text-9xl" />
             <p className="text-header text-base sm:text-xl md:text-2xl font-bold">
@@ -211,7 +226,7 @@ export default function ArqChat() {
         ) : (
           <div>
             <p className="font-semibold text-base text-center leading-5 sm:text-xl md:text-2xl px-2 uppercase -mt-4 md:-mt-2 flex justify-center">
-              Hey {driver.name}!
+              Hey {user.name}!
             </p>
             <div className="flex flex-col gap-2 mt-4 p-8 md:p-2">
               {loader ? (
@@ -240,7 +255,7 @@ export default function ArqChat() {
                     </p>
                     <div className="flex gap-1 items-end py-4">
                       <p className="font-light text-sm sm:text-base md:text-xl leading-6 sm:leading-9 md:leading-8">
-                        {chat.senderId === chat.driverId ? "you:" : ""}
+                        {chat.senderId === chat.userId ? "you:" : ""}
                       </p>
                       <p className="text-base sm:text-xl md:text-2xl py-2 text-normal line-clamp-1 h-8 sm:h-10">
                         {chat.lastMessage}
@@ -283,17 +298,17 @@ export default function ArqChat() {
               <div
                 key={index}
                 className={`mb-3 flex ${
-                  msg.senderId === driver.uid ? "justify-end" : "justify-start"
+                  msg.senderId === user.uid ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
                   className={`p-4 md:p-6 rounded-xl max-w-[70%] ${
-                    msg.senderId === driver.uid ? "bg-brand" : "bg-panel"
+                    msg.senderId === user.uid ? "bg-brand" : "bg-panel"
                   }`}
                 >
-                  <p className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${msg.senderId === driver.uid ? "justify-end" : "justify-start"}`}>{msg.sender}</p>
+                  <p className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}>{msg.sender}</p>
                   <p className="text-base sm:text-xl md:text-2xl py-4">{msg.text}</p>
-                  <p className={`text-label text-xs sm:text-sm md:text-base flex ${msg.senderId === driver.uid ? "justify-end" : "justify-start"}`}>
+                  <p className={`text-label text-xs sm:text-sm md:text-base flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}>
                     {msg.time ? new Date(msg.time).toLocaleString() : ""}
                   </p>
                 </div>

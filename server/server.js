@@ -13,6 +13,7 @@ import imageRoute from "./routes/imageRoute.js";
 import regRoute from "./routes/regRoute.js";
 import regGet from "./routes/regGet.js";
 import convoGet from "./routes/convoGet.js";
+import { FaUserShield } from "react-icons/fa";
 
 dotenv.config();
 
@@ -125,6 +126,51 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("join_user", async ({ userId }) => {
+    try {
+      if (!userId) return;
+      const userRoom = `user_${userId}`;
+      socket.join(userRoom);
+      console.log(`socket ${socket.id} joined user room ${userRoom}`);
+
+      const col = await messsageCollection();
+      const pipeline = [
+        { $match: { userId } },
+        { $sort: { time: -1 } },
+        {
+          $group: {
+            _id: { userId: "$userId", carId: "$carId" },
+            lastMessage: { $first: "$text" },
+            sender: { $first: "$sender" },
+            senderId: { $first: "$senderId" },
+            driverId: { $first: "$driverId" },
+            client: { $first: "$client" },
+            time: { $first: "$time" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            userId: "$_id.userId",
+            carId: "$_id.carId",
+            lastMessage: 1,
+            sender: 1,
+            senderId: 1,
+            driverId: 1,
+            client: 1,
+            time: 1,
+          },
+        },
+        { $sort: { time: -1 } },
+      ];
+
+      const convos = await col.aggregate(pipeline).toArray();
+      socket.emit("user_conversations", convos);
+    } catch (err) {
+      console.error("user_conversation error", err);
+    }
+  });
+
   socket.on("send_message", async (data) => {
     try {
       const {
@@ -159,8 +205,10 @@ io.on("connection", (socket) => {
 
       const room = convoRoomId({ carId, driverId, userId });
       io.to(room).emit("new_message", msg);
-      const driverRoom = `driver_${driverId}`;
-      io.to(driverRoom).emit("new_message", msg);
+      
+      
+      io.to(`driver_${driverId}`).emit("new_message", msg);
+      io.to(`user_${userId}`).emit("new_message", msg);
     } catch (err) {
       console.error("send_message error", err);
     }
