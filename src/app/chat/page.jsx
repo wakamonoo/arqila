@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, act } from "react";
 import { MdSend } from "react-icons/md";
 import Loader from "@/components/loader";
 import { auth } from "@/firebase/firebaseConfig";
@@ -44,8 +44,8 @@ export default function ArqChat() {
           console.error("failed to fetch user", err);
         }
       } else {
-        setDriver(null);
         setUser(null);
+        setRole(null);
       }
     });
 
@@ -84,6 +84,7 @@ export default function ArqChat() {
           sender: msg.sender,
           senderId: msg.senderId,
           driverId: msg.driverId,
+          driverName: msg.driverName,
           client: msg.client,
           time: msg.time,
         };
@@ -131,9 +132,10 @@ export default function ArqChat() {
     }
   }, [messages]);
 
-  const openConversation = ({ userId, carId }) => {
+  const openConversation = ({ userId, driverId, carId }) => {
     if (!user?.uid) return;
-    setActive({ userId, carId });
+
+    setActive({ userId, driverId, carId });
     setMessages([]);
 
     socket.off("conversation_history");
@@ -168,6 +170,7 @@ export default function ArqChat() {
     const messageData = {
       carId: active.carId,
       driverId: role === "driver" ? user.uid : active?.driverId,
+      driverName: role === "driver" ? user.name : convo?.driverName,
       userId: active.userId,
       text: reply,
       sender: user.name,
@@ -192,7 +195,7 @@ export default function ArqChat() {
     const fetchCarName = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}/api/convo/convoGet?carId=${active.carId}&userId=${active.userId}&driverId=${user.uid}`
+          `${BASE_URL}/api/convo/convoGet?carId=${active.carId}&userId=${active.userId}&driverId=${active.driverId}`
         );
         const data = await res.json();
         setCarName(data.carName);
@@ -245,17 +248,18 @@ export default function ArqChat() {
                     onClick={() =>
                       openConversation({
                         userId: chat.userId,
+                        driverId: chat.driverId,
                         carId: chat.carId,
                       })
                     }
                     className="bg-second rounded p-4 cursor-pointer duration-200 hover:bg-[var(--color-highlight)] active:bg-[var(--color-highlight)]"
                   >
                     <p className="text-base sm:text-xl md:text-2xl font-bold leading-5">
-                      {chat.client || chat.userId}
+                      {role === "driver" ? chat.client || chat.userId : chat.driverName || active.driverId}
                     </p>
                     <div className="flex gap-1 items-end py-4">
                       <p className="font-light text-sm sm:text-base md:text-xl leading-6 sm:leading-9 md:leading-8">
-                        {chat.senderId === chat.userId ? "you:" : ""}
+                        { chat.senderId === user.uid ? "you:" : "" }
                       </p>
                       <p className="text-base sm:text-xl md:text-2xl py-2 text-normal line-clamp-1 h-8 sm:h-10">
                         {chat.lastMessage}
@@ -281,7 +285,7 @@ export default function ArqChat() {
             <FaArrowLeft className="text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
           </button>
           <div className="flex flex-col md:px-4 lg:px-8">
-            <p className="text-base sm:text-xl md:text-2xl leading-3.5">{active ? convo?.client || active.userId : "select conversation"}</p>
+            <p className="text-base sm:text-xl md:text-2xl leading-3.5">{active ? role === "driver" ? convo?.client || active.userId : convo.driverName || active.driverId : "select conversation"}</p>
             <p className="text-xs sm:text-sm md:text-base text-label">{active ? carName || "carname" : "select conversation"}</p>
           </div>
         </div>
