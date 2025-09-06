@@ -138,7 +138,9 @@ export default function ArqChat() {
   const openConversation = ({ userId, driverId, carId }) => {
     if (!user?.uid) return;
 
-    setActive({ userId, driverId, carId });
+    const resUserId = userId;
+    const resDriverId = driverId;
+    setActive({ userId: resUserId, driverId: resDriverId, carId });
     setMessages([]);
 
     socket.off("conversation_history");
@@ -164,7 +166,7 @@ export default function ArqChat() {
     socket.on("conversation_history", onHistory);
     socket.on("new_message", onNew);
 
-    socket.emit("join_conversation", { carId, driverId: role === "driver" ? user.uid : active?.driverId, userId });
+    socket.emit("join_conversation", { carId, driverId: resDriverId, userId: resUserId });
   };
 
   const sendReply = () => {
