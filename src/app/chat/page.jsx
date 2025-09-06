@@ -310,7 +310,7 @@ export default function ArqChat() {
                     msg.senderId === user.uid ? "bg-brand" : "bg-panel"
                   }`}
                 >
-                  <p className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}>{msg.sender}</p>
+                  <p className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}>{msg.senderId === user.uid ? "you" : msg.sender}</p>
                   <p className="text-base sm:text-xl md:text-2xl py-4">{msg.text}</p>
                   <p className={`text-label text-xs sm:text-sm md:text-base flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}>
                     {msg.time ? new Date(msg.time).toLocaleString() : ""}
