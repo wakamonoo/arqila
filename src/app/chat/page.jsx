@@ -27,6 +27,7 @@ export default function ArqChat() {
   const listRef = useRef(null);
   const [loader, setLoader] = useState(false);
   const [carName, setCarName] = useState(null);
+  const [refresher, setRefresher] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
@@ -97,6 +98,8 @@ export default function ArqChat() {
         return copy;
       });
 
+      setRefresher((prev) => (!prev));
+
       if (
         active &&
         active.userId === msg.userId &&
@@ -124,7 +127,7 @@ export default function ArqChat() {
       socket.off("driver_conversations", onConvos);
       socket.off("new_message", onNewMessage);
     };
-  }, [user?.uid]);
+  }, [user?.uid, role, refresher]);
 
   useEffect(() => {
     if (listRef.current) {
