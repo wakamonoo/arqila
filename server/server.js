@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import http from "http";
 import { Server as SocketServer } from "socket.io";
 import clientPromise from "./lib/mongodb.js";
+import { v4 as uuidv4 } from "uuid";
 
 import userRoutes from "./routes/userRoutes.js";
 import userGet from "./routes/userGet.js";
@@ -13,7 +14,8 @@ import imageRoute from "./routes/imageRoute.js";
 import regRoute from "./routes/regRoute.js";
 import regGet from "./routes/regGet.js";
 import convoGet from "./routes/convoGet.js";
-import { FaUserShield } from "react-icons/fa";
+import msgRoute from "./routes/msgRoute.js"
+
 
 dotenv.config();
 
@@ -50,6 +52,7 @@ app.use("/api/register", regRoute);
 app.use("/api/register", regGet);
 app.use("/api/images", imageRoute);
 app.use("/api/convo", convoGet);
+app.use("/api/messages", msgRoute);
 
 async function messsageCollection() {
   const client = await clientPromise;
@@ -60,6 +63,7 @@ async function messsageCollection() {
 
 const convoRoomId = ({ carId, driverId, userId }) =>
   `${carId}_${driverId}_${userId}`;
+const messageId = `msg-${uuidv4()}`;
 
 io.on("connection", (socket) => {
   socket.on("join_conversation", async ({ carId, driverId, userId }) => {
@@ -201,6 +205,7 @@ io.on("connection", (socket) => {
         sender,
         senderId,
         client,
+        msgId: messageId,
         time: data.time ? new Date(data.time) : new Date(),
       };
 

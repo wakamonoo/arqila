@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect, act } from "react";
-import { MdSend } from "react-icons/md";
+import { MdClose, MdSend, MdWarning } from "react-icons/md";
 import Loader from "@/components/loader";
 import { auth } from "@/firebase/firebaseConfig";
 import { io } from "socket.io-client";
@@ -8,8 +8,10 @@ import {
   FaArrowLeft,
   FaHandPaper,
   FaInbox,
+  FaTrash,
   FaUserAltSlash,
 } from "react-icons/fa";
+import Swal from "sweetalert2";
 const BASE_URL =
   process.env.NODE_ENV === "production"
     ? "https://arqila.onrender.com"
@@ -27,19 +29,23 @@ export default function ArqChat() {
   const listRef = useRef(null);
   const [loader, setLoader] = useState(false);
   const [carName, setCarName] = useState(null);
+  const [delConfirm, setDelConfirm] = useState(false);
+  const [selectedMsgId, setSelectedMsgId] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
       if (authUser) {
-        try{
-          const res = await fetch(`${BASE_URL}/api/users/users/${authUser.uid}`);
+        try {
+          const res = await fetch(
+            `${BASE_URL}/api/users/users/${authUser.uid}`
+          );
           const dbUser = await res.json();
 
           setUser({
             uid: authUser.uid,
             name: dbUser.name || authUser.displayName || authUser.email,
           });
-          setRole(dbUser.role)
+          setRole(dbUser.role);
         } catch (err) {
           console.error("failed to fetch user", err);
         }
@@ -58,7 +64,7 @@ export default function ArqChat() {
     if (!user?.uid || !role) return;
     setLoader(true);
 
-    if(role === "driver") {
+    if (role === "driver") {
       socket.emit("join_driver", { driverId: user.uid });
     } else {
       socket.emit("join_user", { userId: user.uid });
@@ -117,7 +123,10 @@ export default function ArqChat() {
     socket.off("user_conversations", onConvos);
     socket.off("new_message", onNewMessage);
 
-    socket.on(role === "driver" ? "driver_conversations" : "user_conversations", onConvos);
+    socket.on(
+      role === "driver" ? "driver_conversations" : "user_conversations",
+      onConvos
+    );
     socket.on("new_message", onNewMessage);
 
     return () => {
@@ -207,9 +216,45 @@ export default function ArqChat() {
     fetchCarName();
   }, [active, user]);
 
+  const delMessage = async (msgId) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/messages/msgDel/${msgId}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        Swal.fire({
+          title: "Sucess",
+          text: "message deleted",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
+      } else {
+        console.error("failed to delete message");
+        Swal.fire({
+          title: "Error",
+          text: data.error || "message deletion failed",
+          icon: "error",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="flex  h-screen">
-      <aside className={`bg-brand md:w-[28%] ${active ? "hidden md:flex md:flex-col" : "w-full"}`}>
+      <aside
+        className={`bg-brand md:w-[28%] ${
+          active ? "hidden md:flex md:flex-col" : "w-full"
+        }`}
+      >
         <div className="flex justify-between items-center gap-2 p-4">
           <a href="/">
             <FaArrowLeft className="text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
@@ -255,11 +300,13 @@ export default function ArqChat() {
                     className="bg-second rounded p-4 cursor-pointer duration-200 hover:bg-[var(--color-highlight)] active:bg-[var(--color-highlight)]"
                   >
                     <p className="text-base sm:text-xl md:text-2xl font-bold leading-5">
-                      {role === "driver" ? chat.client || chat.userId : chat.driverName || active.driverId}
+                      {role === "driver"
+                        ? chat.client || chat.userId
+                        : chat.driverName || active.driverId}
                     </p>
                     <div className="flex gap-1 items-end py-4">
                       <p className="font-light text-sm sm:text-base md:text-xl leading-6 sm:leading-9 md:leading-8">
-                        { chat.senderId === user.uid ? "you:" : "" }
+                        {chat.senderId === user.uid ? "you:" : ""}
                       </p>
                       <p className="text-base sm:text-xl md:text-2xl py-2 text-normal line-clamp-1 h-8 sm:h-10">
                         {chat.lastMessage}
@@ -277,7 +324,9 @@ export default function ArqChat() {
       </aside>
 
       <main
-        className={`flex flex-col bg-second md:w-[72%] ${active ? "w-full" : "hidden md:flex"}`}
+        className={`flex flex-col bg-second md:w-[72%] ${
+          active ? "w-full" : "hidden md:flex"
+        }`}
         style={{ height: "100dvh" }}
       >
         <div className="bg-panel p-4 flex gap-8 items-center">
@@ -285,8 +334,16 @@ export default function ArqChat() {
             <FaArrowLeft className="text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110" />
           </button>
           <div className="flex flex-col md:px-4 lg:px-8">
-            <p className="text-base sm:text-xl md:text-2xl leading-3.5">{active ? role === "driver" ? convo?.client || active.userId : convo.driverName || active.driverId : "select conversation"}</p>
-            <p className="text-xs sm:text-sm md:text-base text-label">{active ? carName || "carname" : "select conversation"}</p>
+            <p className="text-base sm:text-xl md:text-2xl leading-3.5">
+              {active
+                ? role === "driver"
+                  ? convo?.client || active.userId
+                  : convo.driverName || active.driverId
+                : "select conversation"}
+            </p>
+            <p className="text-xs sm:text-sm md:text-base text-label">
+              {active ? carName || "carname" : "select conversation"}
+            </p>
           </div>
         </div>
 
@@ -295,7 +352,9 @@ export default function ArqChat() {
             <Loader />
           ) : messages.length === 0 ? (
             <div className="flex justify-center items-center h-full">
-              <p className="text-xs sm:text-sm md:text-base text-label">no messages</p>
+              <p className="text-xs sm:text-sm md:text-base text-label">
+                no messages
+              </p>
             </div>
           ) : (
             messages.map((msg, index) => (
@@ -310,9 +369,36 @@ export default function ArqChat() {
                     msg.senderId === user.uid ? "bg-brand" : "bg-panel"
                   }`}
                 >
-                  <p className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}>{msg.senderId === user.uid ? "you" : msg.sender}</p>
-                  <p className="text-base sm:text-xl md:text-2xl py-4">{msg.text}</p>
-                  <p className={`text-label text-xs sm:text-sm md:text-base flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}>
+                  <div className="flex items-center justify-between">
+                    {msg.senderId === user.uid && (
+                      <FaTrash
+                        className="text-xs sm:text-sm md:text-base text-label duration-200 hover:text-[var(--color-text)] cursor-pointer"
+                        onClick={() => {
+                          setSelectedMsgId(msg.msgId);
+                          setDelConfirm(true);
+                        }}
+                      />
+                    )}
+                    <p
+                      className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${
+                        msg.senderId === user.uid
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      {msg.senderId === user.uid ? "you" : msg.sender}
+                    </p>
+                  </div>
+                  <p className="text-base sm:text-xl md:text-2xl py-4">
+                    {msg.text}
+                  </p>
+                  <p
+                    className={`text-label text-xs sm:text-sm md:text-base flex ${
+                      msg.senderId === user.uid
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}
+                  >
                     {msg.time ? new Date(msg.time).toLocaleString() : ""}
                   </p>
                 </div>
@@ -346,6 +432,41 @@ export default function ArqChat() {
           </button>
         </div>
       </main>
+      {delConfirm && (
+        <div className="fixed w-full inset-0 backdrop-blur-xs z-[70] flex items-center justify-center">
+          <div className="relative bg-panel w-[350px] sm:w-[400px] md:w-[450px] h-[400px] sm:h-[450px] md:h-[500px] rounded-2xl p-6">
+            <MdClose
+              onClick={() => setDelConfirm(false)}
+              className="absolute cursor-pointer right-4 top-4 text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110"
+            />
+            <div className="flex flex-col justify-center mt-[35%] items-center">
+              <div className="flex gap-2 items-center">
+                <MdWarning className="text-2xl" />
+                <p className="text-center text-xl text-highlight capitalize font-bold">
+                  delete message?
+                </p>
+              </div>
+              <div className="flex flex-col mt-4 px-12 w-full gap-2">
+                <button
+                  onClick={() => {
+                    delMessage(selectedMsgId);
+                    setDelConfirm(false);
+                  }}
+                  className="bg-red-600 p-2 rounded-full w-full duration-200 hover:bg-red-700 active:bg-red-700 cursor-pointer"
+                >
+                  Yes, Delete it
+                </button>
+                <button
+                  onClick={() => setDelConfirm(false)}
+                  className="bg-highlight p-2 rounded-full w-full duration-200 hover:bg-[var(--color-highlight-hover)] active:bg-[var(--color-highlight-hover)] cursor-pointer"
+                >
+                  No, Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
