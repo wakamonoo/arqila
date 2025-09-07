@@ -428,7 +428,7 @@ export default function Profile() {
 
           {showInfo && (
             <div className="flex justify-center items-center flex-col gap-2 p-4 mt-2">
-              <div className="grid grid-cols-1 lg:grid-cols-2  gap-2 sm:gap-4 md:gap-6 max-w-4xl">
+              <div className="flex flex-col md:grid md:grid-cols-2 p-2 gap-2 sm:gap-4 md:gap-6 max-w-4xl w-full">
                 <p className="text-header font-heading text-base sm:text-xl md:text-2xl leading-6 sm:leading-8 md:leading-10">
                   Full Name:
                   <br />
