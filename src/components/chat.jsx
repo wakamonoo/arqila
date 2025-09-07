@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-import { MdClose, MdSend } from "react-icons/md";
+import { MdClose, MdSend, MdWarning } from "react-icons/md";
+import { FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const BASE_URL =
   process.env.NODE_ENV === "production"
@@ -21,6 +23,8 @@ export default function Chat({
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const listRef = useRef(null);
+  const [delConfirm, setDelConfirm] = useState(false);
+  const [selectedMsgId, setSelectedMsgId] = useState(null);
 
   useEffect(() => {
     if (listRef.current) {
@@ -80,6 +84,38 @@ export default function Chat({
     setMessage("");
   };
 
+  const delMessage = async (msgId) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/messages/msgDel/${msgId}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        Swal.fire({
+          title: "Sucess",
+          text: "message deleted",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
+      } else {
+        console.error("failed to delete message");
+        Swal.fire({
+          title: "Error",
+          text: data.error || "message deletion failed",
+          icon: "error",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div
       ref={chatRef}
@@ -117,9 +153,34 @@ export default function Chat({
                     isMe ? "bg-brand" : "bg-panel"
                   }`}
                 >
-                  <p className="text-sm font-semibold">{msg.sender}</p>
-                  <p className="text-base">{msg.text}</p>
-                  <p className="text-label text-xs">{time}</p>
+                  <div className="flex items-center justify-between">
+                    {isMe && (
+                      <FaTrash
+                        className="text-xs sm:text-sm md:text-base text-label duration-200 hover:text-[var(--color-text)] cursor-pointer"
+                        onClick={() => {
+                          setSelectedMsgId(msg.msgId);
+                          setDelConfirm(true);
+                        }}
+                      />
+                    )}
+                    <p
+                      className={`text-label text-sm sm:text-base md:text-xl font-semibold flex ${
+                        isMe ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      {isMe ? "you" : msg.sender}
+                    </p>
+                  </div>
+                  <p className="text-base sm:text-xl md:text-2xl py-4">
+                    {msg.text}
+                  </p>
+                  <p
+                    className={`text-label text-xs sm:text-sm md:text-base flex ${
+                      isMe ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    {time}
+                  </p>
                 </div>
               </div>
             );
@@ -145,6 +206,44 @@ export default function Chat({
           className="cursor-pointer text-5xl text-normal bg-second p-2 w-[15%] h-[6vh] rounded-md transition duration-100 hover:scale-110 active:scale-110"
         />
       </div>
+      {delConfirm && (
+        <div
+          onClick={() => setDelConfirm(false)}
+          className="fixed w-full inset-0 backdrop-blur-xs z-[70] flex items-center justify-center"
+        >
+          <div className="relative bg-panel w-[350px] sm:w-[400px] md:w-[450px] h-[400px] sm:h-[450px] md:h-[500px] rounded-2xl p-6">
+            <MdClose
+              onClick={() => setDelConfirm(false)}
+              className="absolute cursor-pointer right-4 top-4 text-2xl sm:text-3xl md:text-4xl font-bold duration-200 hover:scale-110 active:scale-110"
+            />
+            <div className="flex flex-col justify-center mt-[35%] items-center">
+              <div className="flex gap-2 items-center">
+                <MdWarning className="text-2xl sm:text-3xl md:text-4xl" />
+                <p className="text-center text-xl sm:text-2xl md:text-3xl  text-highlight capitalize font-bold">
+                  delete message?
+                </p>
+              </div>
+              <div className="flex flex-col mt-4 px-12 w-full gap-2">
+                <button
+                  onClick={() => {
+                    delMessage(selectedMsgId);
+                    setDelConfirm(false);
+                  }}
+                  className="bg-red-600 p-2 rounded-full w-full duration-200 hover:bg-red-700 active:bg-red-700 cursor-pointer text-base sm:text-xl md:text-2xl"
+                >
+                  Yes, Delete it
+                </button>
+                <button
+                  onClick={() => setDelConfirm(false)}
+                  className="bg-highlight p-2 rounded-full w-full duration-200 hover:bg-[var(--color-highlight-hover)] active:bg-[var(--color-highlight-hover)] cursor-pointer text-base sm:text-xl md:text-2xl"
+                >
+                  No, Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

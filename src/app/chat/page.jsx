@@ -248,6 +248,8 @@ export default function ArqChat() {
     }
   };
 
+
+
   return (
     <div className="flex  h-screen">
       <aside
@@ -433,7 +435,7 @@ export default function ArqChat() {
         </div>
       </main>
       {delConfirm && (
-        <div className="fixed w-full inset-0 backdrop-blur-xs z-[70] flex items-center justify-center">
+        <div onClick={() => setDelConfirm(false)} className="fixed w-full inset-0 backdrop-blur-xs z-[70] flex items-center justify-center">
           <div className="relative bg-panel w-[350px] sm:w-[400px] md:w-[450px] h-[400px] sm:h-[450px] md:h-[500px] rounded-2xl p-6">
             <MdClose
               onClick={() => setDelConfirm(false)}
@@ -441,8 +443,8 @@ export default function ArqChat() {
             />
             <div className="flex flex-col justify-center mt-[35%] items-center">
               <div className="flex gap-2 items-center">
-                <MdWarning className="text-2xl" />
-                <p className="text-center text-xl text-highlight capitalize font-bold">
+                <MdWarning className="text-2xl sm:text-3xl md:text-4xl" />
+                <p className="text-center text-xl sm:text-2xl md:text-3xl  text-highlight capitalize font-bold">
                   delete message?
                 </p>
               </div>
@@ -452,13 +454,13 @@ export default function ArqChat() {
                     delMessage(selectedMsgId);
                     setDelConfirm(false);
                   }}
-                  className="bg-red-600 p-2 rounded-full w-full duration-200 hover:bg-red-700 active:bg-red-700 cursor-pointer"
+                  className="bg-red-600 p-2 rounded-full w-full duration-200 hover:bg-red-700 active:bg-red-700 cursor-pointer text-base sm:text-xl md:text-2xl"
                 >
                   Yes, Delete it
                 </button>
                 <button
                   onClick={() => setDelConfirm(false)}
-                  className="bg-highlight p-2 rounded-full w-full duration-200 hover:bg-[var(--color-highlight-hover)] active:bg-[var(--color-highlight-hover)] cursor-pointer"
+                  className="bg-highlight p-2 rounded-full w-full duration-200 hover:bg-[var(--color-highlight-hover)] active:bg-[var(--color-highlight-hover)] cursor-pointer text-base sm:text-xl md:text-2xl"
                 >
                   No, Cancel
                 </button>

@@ -63,7 +63,6 @@ async function messsageCollection() {
 
 const convoRoomId = ({ carId, driverId, userId }) =>
   `${carId}_${driverId}_${userId}`;
-const messageId = `msg-${uuidv4()}`;
 
 io.on("connection", (socket) => {
   socket.on("join_conversation", async ({ carId, driverId, userId }) => {
@@ -71,7 +70,7 @@ io.on("connection", (socket) => {
       if (!carId || !driverId || !userId) return;
       const room = convoRoomId({ carId, driverId, userId });
       socket.join(room);
-      console.log(`socket &{socket.id} has joined convo room ${room}`);
+      console.log(`socket ${socket.id} has joined convo room ${room}`);
 
       const col = await messsageCollection();
       const history = await col
@@ -205,7 +204,7 @@ io.on("connection", (socket) => {
         sender,
         senderId,
         client,
-        msgId: messageId,
+        msgId: `msg-${uuidv4()}`,
         time: data.time ? new Date(data.time) : new Date(),
       };
 
