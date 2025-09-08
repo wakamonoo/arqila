@@ -53,34 +53,39 @@ export default function Contact() {
 
       <form
         ref={contact}
+        onSubmit={sendEmail}
         className="flex flex-col gap-2 md:gap-4 justify-center"
       >
         <input
           name="name"
+          required
           className="bg-panel p-2 w-full h-auto rounded text-normal text-base sm:text-xl md:text-2xl"
           type="text"
           placeholder="full name"
         />
         <input
           name="email"
+          required
           className="bg-panel p-2 w-full h-auto rounded text-normal text-base sm:text-xl md:text-2xl"
-          type="text"
+          type="email"
           placeholder="email address"
         />
         <input
           name="title"
+          required
           className="bg-panel p-2 w-full h-auto rounded text-normal text-base sm:text-xl md:text-2xl"
           type="text"
           placeholder="subject"
         />
         <textarea
           name="message"
+          required
           className="bg-panel p-2 w-full h-[24vh] rounded text-normal text-base sm:text-xl md:text-2xl"
           type="text"
           placeholder="message"
         />
         <button
-          onClick={sendEmail}
+          type="submit"
           className="p-2 duration-200 cursor-pointer hover:bg-[var(--color-secondary)] bg-highlight rounded text-second  hover:text-[var(--color-highlight)] text-base sm:text-xl md:text-2xl text-center uppercase font-bold"
         >
           send email
