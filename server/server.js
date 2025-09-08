@@ -88,6 +88,74 @@ io.on("connection", (socket) => {
 
       const room = convoRoomId({ carId, driverId, userId });
       io.to(room).emit("message_deleted", msgId);
+
+      const driverPipeline = [
+        { $match: { driverId } },
+        { $sort: { time: -1 } },
+        {
+          $group: {
+            _id: { userId: "$userId", carId: "$carId" },
+            lastMessage: { $first: "$text" },
+            sender: { $first: "$sender" },
+            senderId: { $first: "$senderId" },
+            driverId: { $first: "$driverId" },
+            client: { $first: "$client" },
+            time: { $first: "$time" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            userId: "$_id.userId",
+            carId: "$_id.carId",
+            lastMessage: 1,
+            sender: 1,
+            senderId: 1,
+            driverId: 1,
+            client: 1,
+            time: 1,
+          },
+        },
+        { $sort: { time: -1 } },
+      ];
+
+      const driverConvos = await col.aggregate(driverPipeline).toArray();
+      io.to(`driver_${driverId}`).emit("driver_conversations", driverConvos);
+
+      const userPipeline = [
+        { $match: { userId } },
+        { $sort: { time: -1 } },
+        {
+          $group: {
+            _id: { userId: "$userId", carId: "$carId" },
+            lastMessage: { $first: "$text" },
+            sender: { $first: "$sender" },
+            senderId: { $first: "$senderId" },
+            driverId: { $first: "$driverId" },
+            driverName: { $first: "$driverName" },
+            client: { $first: "$client" },
+            time: { $first: "$time" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            userId: "$_id.userId",
+            carId: "$_id.carId",
+            lastMessage: 1,
+            sender: 1,
+            senderId: 1,
+            driverId: 1,
+            driverName: 1,
+            client: 1,
+            time: 1,
+          },
+        },
+        { $sort: { time: -1 } },
+      ];
+
+      const userConvos = await col.aggregate(userPipeline).toArray();
+      io.to(`user_${userId}`).emit("user_conversations", userConvos);
     } catch (err) {
       console.error("failed to delete message", err);
     }

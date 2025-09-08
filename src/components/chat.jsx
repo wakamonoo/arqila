@@ -125,7 +125,7 @@ export default function Chat({
       <div ref={listRef} className="flex-1 overflow-auto p-4">
         {messages.length === 0 ? (
           <div className="flex justify-center items-center h-full">
-            <p className="text-xs text-label">no messages</p>
+            <p className="text-xs sm:text-sm md:text-base text-label">no messages</p>
           </div>
         ) : (
           messages.map((msg, index) => {

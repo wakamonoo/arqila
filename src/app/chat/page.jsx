@@ -255,7 +255,7 @@ export default function ArqChat() {
           <div />
         </div>
         {!user ? (
-          <div className="flex flex-col gap-2 justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex flex-col justify-center items-center mt-[25vh]">
             <FaUserAltSlash className="text-7xl sm:text-8xl md:text-9xl" />
             <p className="text-header text-base sm:text-xl md:text-2xl font-bold">
               kindly login first
@@ -270,7 +270,7 @@ export default function ArqChat() {
               {loader ? (
                 <Loader />
               ) : convos.length === 0 ? (
-                <div className="flex flex-col gap-2 justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="flex flex-col justify-center items-center mt-[25vh]">
                   <FaInbox className="text-7xl sm:text-8xl md:text-9xl" />
                   <p className="text-header text-base sm:text-xl md:text-2xl font-bold">
                     no messages yet
