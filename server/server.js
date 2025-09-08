@@ -14,8 +14,6 @@ import imageRoute from "./routes/imageRoute.js";
 import regRoute from "./routes/regRoute.js";
 import regGet from "./routes/regGet.js";
 import convoGet from "./routes/convoGet.js";
-import msgRoute from "./routes/msgRoute.js"
-
 
 dotenv.config();
 
@@ -52,7 +50,6 @@ app.use("/api/register", regRoute);
 app.use("/api/register", regGet);
 app.use("/api/images", imageRoute);
 app.use("/api/convo", convoGet);
-app.use("/api/messages", msgRoute);
 
 async function messsageCollection() {
   const client = await clientPromise;
@@ -84,13 +81,17 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("delete_message", async({ msgId, carId, userId, driverId }) => {
-    const room = convoRoomId({ carId, driverId, userId });
+  socket.on("delete_message", async ({ msgId, carId, userId, driverId }) => {
+    try {
+      const col = await messsageCollection();
+      await col.deleteOne({ msgId });
 
-    io.to(room).emit("message_deleted", { msgId });
-    io.to(`driver_${driverId}`).emit("message_deleted", { msgId });
-    io.to(`user_${userId}`).emit("message_deleted", { msgId });
-  })
+      const room = convoRoomId({ carId, driverId, userId });
+      io.to(room).emit("message_deleted", msgId);
+    } catch (err) {
+      console.error("failed to delete message", err);
+    }
+  });
 
   socket.on("join_driver", async ({ driverId }) => {
     try {
@@ -221,8 +222,7 @@ io.on("connection", (socket) => {
 
       const room = convoRoomId({ carId, driverId, userId });
       io.to(room).emit("new_message", msg);
-      
-      
+
       io.to(`driver_${driverId}`).emit("new_message", msg);
       io.to(`user_${userId}`).emit("new_message", msg);
     } catch (err) {

@@ -216,42 +216,15 @@ export default function ArqChat() {
     fetchCarName();
   }, [active, user]);
 
-  const delMessage = async (msgId) => {
-    try {
-      const res = await fetch(`${BASE_URL}/api/messages/msgDel/${msgId}`, {
-        method: "DELETE",
-      });
+  const delMessage = (msgId) => {
+    socket.emit("delete_message", {
+      msgId,
+      carId: active.carId,
+      userId: active.userId,
+      driverId: active.driverId,
+    });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        Swal.fire({
-          title: "Sucess",
-          text: "message deleted",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        socket.emit("delete_message", {
-          msgId,
-          carId: active.carId,
-          userId: active.userId,
-          driverId: active.driverId,
-        });
-        setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
-      } else {
-        console.error("failed to delete message");
-        Swal.fire({
-          title: "Error",
-          text: data.error || "message deletion failed",
-          icon: "error",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
   };
 
   useEffect(() => {
