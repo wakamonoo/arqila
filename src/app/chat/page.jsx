@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect, act } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MdClose, MdSend, MdWarning } from "react-icons/md";
 import Loader from "@/components/loader";
 import { auth } from "@/firebase/firebaseConfig";
@@ -232,6 +232,12 @@ export default function ArqChat() {
           timer: 2000,
           showConfirmButton: false,
         });
+        socket.emit("delete_message", {
+          msgId,
+          carId: active.carId,
+          userId: active.userId,
+          driverId: active.driverId,
+        });
         setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
       } else {
         console.error("failed to delete message");
@@ -248,7 +254,16 @@ export default function ArqChat() {
     }
   };
 
+  useEffect(() => {
+    const handleDeleted = async (msgId) => {
+      setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
+    };
 
+    socket.on("message_deleted", handleDeleted);
+    return () => {
+      socket.off("message_deleted", handleDeleted);
+    };
+  }, []);
 
   return (
     <div className="flex  h-screen">
@@ -435,7 +450,10 @@ export default function ArqChat() {
         </div>
       </main>
       {delConfirm && (
-        <div onClick={() => setDelConfirm(false)} className="fixed w-full inset-0 backdrop-blur-xs z-[70] flex items-center justify-center">
+        <div
+          onClick={() => setDelConfirm(false)}
+          className="fixed w-full inset-0 backdrop-blur-xs z-[70] flex items-center justify-center"
+        >
           <div className="relative bg-panel w-[350px] sm:w-[400px] md:w-[450px] h-[400px] sm:h-[450px] md:h-[500px] rounded-2xl p-6">
             <MdClose
               onClick={() => setDelConfirm(false)}

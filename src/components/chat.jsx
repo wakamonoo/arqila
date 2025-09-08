@@ -100,6 +100,12 @@ export default function Chat({
           timer: 2000,
           showConfirmButton: false,
         });
+        socket.emit("delete_message", {
+          msgId,
+          carId: car,
+          userId: user.uid,
+          driverId: driver,
+        });
         setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
       } else {
         console.error("failed to delete message");
@@ -115,6 +121,17 @@ export default function Chat({
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    const handleDeleted = async (msgId) => {
+      setMessages((prev) => prev.filter((m) => m.msgId !== msgId));
+    };
+
+    socket.on("message_deleted", handleDeleted);
+    return () => {
+      socket.off("message_deleted", handleDeleted);
+    };
+  }, []);
 
   return (
     <div

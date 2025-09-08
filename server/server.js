@@ -84,6 +84,14 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("delete_message", async({ msgId, carId, userId, driverId }) => {
+    const room = convoRoomId({ carId, driverId, userId });
+
+    io.to(room).emit("message_deleted", { msgId });
+    io.to(`driver_${driverId}`).emit("message_deleted", { msgId });
+    io.to(`user_${userId}`).emit("message_deleted", { msgId });
+  })
+
   socket.on("join_driver", async ({ driverId }) => {
     try {
       if (!driverId) return;
