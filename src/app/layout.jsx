@@ -35,7 +35,6 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-// ✅ FIX: Bebas Neue import must be Bebas_Neue
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
   weight: "400",
@@ -46,6 +45,9 @@ const bebasNeue = Bebas_Neue({
 export const metadata = {
   title: "arqila",
   description: "car rental system",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
