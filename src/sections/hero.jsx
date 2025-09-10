@@ -7,7 +7,6 @@ import {
   FaUserCircle,
   FaSignInAlt,
 } from "react-icons/fa";
-import { RiLoginBoxLine } from "react-icons/ri";
 import { MdChat, MdEmail } from "react-icons/md";
 import { useRef, useState, useEffect } from "react";
 import GetStarted from "@/components/ctaOne";
@@ -16,11 +15,11 @@ import Image from "next/image";
 import Bground from "@/assets/hero-bg.png";
 import Logo from "@/assets/logo.png";
 
-export default function Hero() {
+export default function Hero({ showSignUp, setShowSignUp }) {
   const [hideNav, setHideNav] = useState(false);
   const navRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false);
+  
   const [hideMNav, setHideMNav] = useState(true);
   const [showPNav, setShowPNav] = useState(false);
 
@@ -230,9 +229,9 @@ export default function Hero() {
               <a href="#contact">
                 <p>contact</p>
               </a>
-              <a onClick={() => setShowSignUp(true)} className="flex">
+              <button onClick={() => setShowSignUp(true)} className="flex">
                 <p>ignition</p>
-              </a>
+              </button>
               <a href="/chat">arqchat</a>
               <a href="/profile">
                 <p>profile</p>
@@ -246,7 +245,7 @@ export default function Hero() {
         <div className="flex flex-col lg:flex-row items-center w-4/5 sm:w-3/4">
           <div className="p-2 mb-4">
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-header font-bold text-left leading-8 sm:leading-10 md:leading-13 lg:leading-16 xl:leading-20">
-              modern renting, <br /> local trust
+              modern renting, <br /> local trust!
             </h1>
             <p className="text-normal text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-normal leading-4.5 sm:leading-6 md:leading-7 lg:leading-8 xl:leading-9">
               from daily rides to long-term needs, arqila makes renting simple
