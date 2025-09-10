@@ -52,4 +52,21 @@ router.put("/driverUp", async (req, res) => {
   }
 });
 
+router.put("/driverDem", async (req, res) => {
+  const { uid  } = req.body;
+  try {
+    const client = await clientPromise;
+    const db = client.db("arqila");
+
+    await db
+      .collection("registration")
+      .updateOne({ uid }, { $set: { status: "pending" } }, { upsert: true });
+      
+      res.status(200).json({ message: "status changed"})
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: "approval process failed"});
+  }
+});
+
 export default router;
