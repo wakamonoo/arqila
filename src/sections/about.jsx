@@ -38,7 +38,7 @@ export default function About() {
               <br />
               Service
             </h2>
-            <p className="text-center font-normal text-normal text-base sm:text-xl md:text-2xl leading-4 sm:leading-5 md:leading-6 mt-4 px-4">Drive freely in our ready-to-go, well-maintained cars.</p>
+            <p className="text-center font-normal text-normal text-base sm:text-xl md:text-2xl leading-4 sm:leading-5 md:leading-6 mt-4 px-4">Rely on our professional drivers for a smooth, comfortable, and hassle-free ride.</p>
           </div>
 
           <div className="flex flex-col items-center justify-center w-[80vw] sm:w-[40vw] md:w-[30vw] lg:w-[20vw] px-4 py-12 bg-panel rounded-t-lg">
@@ -48,7 +48,7 @@ export default function About() {
               <br />
               Reliable
             </h2>
-            <p className="text-center font-normal text-normal text-base sm:text-xl md:text-2xl leading-4 sm:leading-5 md:leading-6 mt-4 px-4">Drive freely in our ready-to-go, well-maintained cars.</p>
+            <p className="text-center font-normal text-normal text-base sm:text-xl md:text-2xl leading-4 sm:leading-5 md:leading-6 mt-4 px-4">Travel with peace of mind in our safe, thoroughly inspected, and dependable cars.</p>
           </div>
         </div>
       </div>

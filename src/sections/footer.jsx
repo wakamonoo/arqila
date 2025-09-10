@@ -6,56 +6,58 @@ import { FaFacebook, FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
 export default function Footer({ setShowSignUp }) {
   return (
     <div className="bg-panel mt-4 sm:mt-8 md:mt-16 lg:mt-32 xl:mt-64 px-4 py-8 sm:p-16 md:p-24 lg:px-32 xl:px-48 2xl:px-84 w-full">
-      <div className="flex justify-between gap-2 border-b-1 border-[var(--color-label)] pb-4 sm:pb-8">
-        <div className="w-[40%] flex flex-col">
-          <h1 className="text-xl sm:text-2xl md:text-3xl text-highlight font-extrabold">
-            Modern Renting, Local Trust!
-          </h1>
-          <button className="bg-highlight mt-2 group duration-200 cursor-pointer hover:bg-[var(--color-secondary)] p-4 rounded-full w-fit">
-            <p className="text-normal text-second duration-200 group-hover:text-[var(--color-highlight)] text-base sm:text-xl md:text-2xl uppercase font-bold">
-              GET STARTED
-            </p>
-          </button>
+      <div className="flex flex-wrap md:flex-nowrap justify-between gap-2 border-b-1 border-[var(--color-label)] pb-4 sm:pb-8">
+        <div className="flex gap-2 w-full">
+          <div className="flex flex-col w-[70%]">
+            <h1 className="text-xl sm:text-2xl md:text-3xl text-highlight font-extrabold">
+              Modern Renting, Local Trust!
+            </h1>
+            <button className="bg-highlight mt-2 group duration-200 cursor-pointer hover:bg-[var(--color-secondary)] p-4 rounded-full w-fit">
+              <p className="text-normal text-second duration-200 group-hover:text-[var(--color-highlight)] text-base sm:text-xl md:text-2xl uppercase font-bold">
+                GET STARTED
+              </p>
+            </button>
+          </div>
+          <div className="text-base sm:text-xl md:text-2xl flex flex-col w-[30%]">
+            <a
+              href="#cars"
+              className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
+            >
+              <p>cars</p>
+            </a>
+            <a
+              href="#about"
+              className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
+            >
+              <p>about</p>
+            </a>
+            <a
+              href="#contact"
+              className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
+            >
+              <p>contact</p>
+            </a>
+            <button
+              onClick={() => setShowSignUp(true)}
+              className="flex cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
+            >
+              <p>ignition</p>
+            </button>
+            <a
+              href="/chat"
+              className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
+            >
+              arqchat
+            </a>
+            <a
+              href="/profile"
+              className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
+            >
+              <p>profile</p>
+            </a>
+          </div>
         </div>
-        <div className="w-[15%] text-base sm:text-xl md:text-2xl flex flex-col">
-          <a
-            href="#cars"
-            className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
-          >
-            <p>cars</p>
-          </a>
-          <a
-            href="#about"
-            className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
-          >
-            <p>about</p>
-          </a>
-          <a
-            href="#contact"
-            className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
-          >
-            <p>contact</p>
-          </a>
-          <button
-            onClick={() => setShowSignUp(true)}
-            className="flex cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
-          >
-            <p>ignition</p>
-          </button>
-          <a
-            href="/chat"
-            className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
-          >
-            arqchat
-          </a>
-          <a
-            href="/profile"
-            className="cursor-pointer hover:text-[var(--color-highlight)] focus:text-[var(--color-highlight)]"
-          >
-            <p>profile</p>
-          </a>
-        </div>
-        <div className="w-[45%] flex flex-col items-center">
+        <div className="flex flex-col items-center">
           <div className="flex gap-1 justify-center items-center w-full p-2">
             <a href="https://wakamonoo.vercel.app/">
               <Image
@@ -88,7 +90,9 @@ export default function Footer({ setShowSignUp }) {
         </div>
       </div>
       <div className="flex justify-center mt-2 md:mt-4">
-        <p className="text-label text-xs sm:text-sm md:textbase">Copyright © 2025 wakamonoo</p>
+        <p className="text-label text-xs sm:text-sm md:textbase">
+          Copyright © 2025 wakamonoo
+        </p>
       </div>
     </div>
   );
