@@ -508,7 +508,7 @@ export default function Profile() {
                 />
                 <button
                   onClick={() => setAddCar(true)}
-                  className="mt-4 bg-highlight group duration-200 cursor-pointer hover:bg-[var(--color-secondary)] p-4 w-fit rounded-full"
+                  className="mt-16 bg-highlight group duration-200 cursor-pointer hover:bg-[var(--color-secondary)] p-4 w-fit rounded-full"
                 >
                   <p className="text-second duration-200 group-hover:text-[var(--color-highlight)] text-base sm:text-xl md:text-2xl uppercase font-bold">
                     list a car

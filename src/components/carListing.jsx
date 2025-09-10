@@ -1,5 +1,5 @@
 "use client";
-import { FaPencilAlt, FaTrash } from "react-icons/fa";
+import { FaBoxOpen, FaPencilAlt, FaTrash } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 import Swal from "sweetalert2";
@@ -57,7 +57,12 @@ export default function CarListing({
     <div>
       <div className="flex flex-wrap justify-center gap-4 w-full px-4">
         {carList.length === 0 ? (
-          <div>nothing</div>
+          <div className="flex flex-col justify-center items-center">
+            <FaBoxOpen className="w-[32vw] sm:w-[24vw] md:w-[16vw] h-auto" />
+            <p className="text-sm sm:text-base md:text-xl text-label font-normal">
+              nothing to display yet
+            </p>
+          </div>
         ) : (
           carList.map((car) => {
             return (
