@@ -44,7 +44,12 @@ const bebasNeue = Bebas_Neue({
 
 export const metadata = {
   title: "arqila",
-  description: "car rental system",
+  description:
+    "arqila is a modernized system dedicated to car rental with driving services.",
+  keywords:
+    "Arqila, car rental, car hire, driving service, rent a car, local trust",
+  authors: [{ name: "Joven Bataller", url: "https://wakamonoo.vercel.app" }],
+  creator: "Joven Bataller",
   icons: {
     icon: "/logo.png",
   },
