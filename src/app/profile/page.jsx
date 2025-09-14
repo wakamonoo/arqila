@@ -13,8 +13,9 @@ import {
 import Swal from "sweetalert2";
 import Loader from "@/components/loader";
 import { MdClose, MdDriveEta } from "react-icons/md";
-import Fallback from "@/assets/user.png";
+import Fallback from "@/assets/fallback.png";
 import CarListing from "@/components/carListing";
+import Image from "next/image";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -353,9 +354,11 @@ export default function Profile() {
       ) : user ? (
         <div>
           <div className="flex flex-col justify-center items-center gap-2 mt-8">
-            <img
+            <Image
               src={fbAuth.photoURL || Fallback}
-              className="w-32 sm:w-40 md:w-50 rounded-full"
+              width={128}
+              height={128}
+              className="sm:w-40 md:w-50 rounded-full"
               alt="user"
             />
             <p className="text-header text-xl sm:text-2xl md:text-3xl font-extrabold text-center uppercase">
